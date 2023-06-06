@@ -1,5 +1,5 @@
 export async function run({socrates, parameters}) {
-  let response = await fetch("/run", {
+  let response = await fetch("https://api.socrates-soil.net/run", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
