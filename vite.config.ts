@@ -19,6 +19,7 @@ const pathSrc = path.resolve(__dirname, 'src')
 
 // https://vitejs.dev/config/
 const defaultConfig = {
+  base: "./",
   resolve: {
     alias: {
       '~/': `${pathSrc}/`,
