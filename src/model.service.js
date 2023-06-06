@@ -19,7 +19,7 @@ export async function run({socrates, parameters}) {
 }
 
 export async function sampleData() {
-  let response = await fetch('/sample-data-20-year.json');
+  let response = await fetch('sample-data-20-year.json');
   if (response.status === 200) {
     response = await response.json();
     return response;
