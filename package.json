@@ -1,13 +1,12 @@
 {
   "name": "socrates-web",
   "private": true,
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "preview": "vite preview",
-    "deploy": "vue-tsc && vite build --base=/socrates-web/"
+    "preview": "vite preview"
   },
   "dependencies": {
     "chart.js": "^4.3.0",
