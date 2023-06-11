@@ -8,15 +8,14 @@ const state = reactive({
 onMounted(() => {
   state.parameters = props.parameters;
 });
-const addParameter = function () {
-}
+
 </script>
 <template>
   <div>
     <el-row class="">
       <el-col :span="8" class="p-2 text-center">Parameter</el-col>
     </el-row>
-    <el-row v-for="(name, index) in state.parameters" :key="index" class="">
+    <el-row v-for="(index) in state.parameters" :key="index" class="">
       <el-col :span="8" class="p-2">
         <el-input v-model="state.parameters[index]">
           <template #prepend>{{index}}</template>
