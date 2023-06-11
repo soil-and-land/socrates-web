@@ -3,13 +3,13 @@
 </script>
 
 <template>
-  <div class="container-fluid">
-    <div class="row">
+  <el-row class="m-4 p-4">
+    <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
       <div class="col-md-1"></div>
       <div class="col-md-10">
         <div class="basic-form">
           <h3 class="center">SOCRATES Help</h3>
-          <h4><a id="Inputs" name="Inputs" href="#Inputs">INPUTS</a></h4>
+          <h4><a id="Inputs" name="Inputs" href="#/help/#Inputs">INPUTS</a></h4>
           <h3>Soil</h3>
           <div class="border-noshadow">
             <h4>Soil content</h4>
@@ -129,7 +129,7 @@
           </div>
         </div>
         <div class="basic-form">
-          <h4><a id="Results" name="Results" href="#Results">RESULTS</a></h4>
+          <h4><a id="Results" name="Results" href="#/help#Results">RESULTS</a></h4>
           <h3>Organic carbon (%)</h3>
           <div class="border-noshadow">
             <p>This graph reports the change in soil organic carbon (0-10 cm) based on the rotation, management, sol
@@ -189,8 +189,8 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </el-col>
+  </el-row>
 </template>
 
 <style scoped>

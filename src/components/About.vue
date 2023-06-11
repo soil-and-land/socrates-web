@@ -3,19 +3,19 @@
 </script>
 
 <template>
-  <div class="row">
+  <el-row class="m-4 p-4">
+    <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
     <div class="col-md-1"></div>
     <div class="col-md-9">
       <div class="basic-form">
-        <h3 class="center">S.O.C.R.A.T.E.S.<br/>Soil Organic Carbon Reserves And Transformations in EcoSystems</h3>
+        <h3 class="center text-3xl">S.O.C.R.A.T.E.S.<br/>Soil Organic Carbon Reserves And Transformations in EcoSystems</h3>
       </div>
     </div>
-  </div>
   <div class="row">
     <div class="col-md-1"></div>
     <div class="col-md-9">
       <div class="basic-form border-noshadow">
-        <h4>A simple model for predicting long-term changes in soil organic carbon in terrestrial ecosystems</h4>
+        <h4 class="text-1xl">A simple model for predicting long-term changes in soil organic carbon in terrestrial ecosystems</h4>
         <p>The maintenance of soil organic carbon (SOC) in terrestrial ecosystems is critical for long-term
           productivity.</p>
         <p>Simulation models of SOC dynamics are valuable tools in predicting the impacts of climate on carbon storage
@@ -31,4 +31,6 @@
     </div>
 
   </div>
+    </el-col>
+  </el-row>
 </template>

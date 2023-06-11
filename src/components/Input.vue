@@ -179,16 +179,17 @@ function addRotation() {
 </script>
 
 <template>
-  <el-row :gutter="20" class="p-6">
-    <el-col :span="24">
+  <el-row :gutter="20" class="flex flex-col justify-center items-center">
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
       <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
     </el-col>
-    <el-col :span="24" class="py-10" v-if="state.errors">
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            class="py-10" v-if="state.errors">
       <el-row>
         <div class="errorMessages">Error: {{ state.errors }}</div>
       </el-row>
     </el-col>
-    <el-col :span="24">
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
       <el-button @click="state.showParameters = !state.showParameters">
         {{ state.showParameters ? 'Hide Parameters' : 'Show Parameters' }}
       </el-button>
@@ -408,31 +409,43 @@ function addRotation() {
         </el-row>
       </el-col>
     </el-col>
-    <el-col :span="24" class="py-10">
-      <el-button @click="sendForm()">Run</el-button>
-      <el-button @click="saveData()">Save
-        Data
-      </el-button>
-      <el-button @click="loadData()" data-toggle="modal">Load
-        Data
-      </el-button>
-      <el-button @click="clearForm()">Clear Form</el-button>
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            class="py-10">
+      <div>
+        <el-button @click="sendForm()">Run</el-button>
+        <el-button @click="saveData()">Save
+          Data
+        </el-button>
+        <el-button @click="loadData()" data-toggle="modal">Load
+          Data
+        </el-button>
+        <el-button @click="clearForm()">Clear Form</el-button>
+      </div>
     </el-col>
-    <el-col :span="24" v-if="state.results">
-      <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="state.results.years"
-                  :data="state.results.organic_carbon.data_points"/>
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            v-if="state.results">
+      <el-row :span="24" class="max-h-[600px]">
+        <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="state.results.years"
+                    :data="state.results.organic_carbon.data_points"/>
+      </el-row>
     </el-col>
-    <el-col :span="24" v-if="state.results">
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            v-if="state.results">
       <management-table :results="state.results"/>
     </el-col>
-    <el-col :span="24" v-if="state.results">
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            v-if="state.results">
       <results-table :results="state.results" :initial-o-c="state.initialOC"/>
     </el-col>
+    <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+            v-if="state.results">
+      <pie-chart :label="'Total greenhouse gas emissions'"
+                 :data="state.results"/>
+    </el-col>
   </el-row>
+  <el-row class="pb-20"></el-row>
 </template>
 
 <style scoped>
-.read-the-docs {
-  color: #888;
-}
+
 </style>

@@ -31,6 +31,7 @@ declare module '@vue/runtime-core' {
     LineChart: typeof import('./components/LineChart.vue')['default']
     ManagementTable: typeof import('./components/ManagementTable.vue')['default']
     ParameterTable: typeof import('./components/ParameterTable.vue')['default']
+    PieChart: typeof import('./components/PieChart.vue')['default']
     ResultsTable: typeof import('./components/ResultsTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

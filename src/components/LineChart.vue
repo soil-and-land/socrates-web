@@ -8,7 +8,7 @@ let chartContext;
 let data;
 let options;
 
-const renderChart = ({min, max, data}) => {
+const renderChart = ({min, max}) => {
   chart = new Chart(chartContext, {
     type: 'line',
     data: {
@@ -48,11 +48,10 @@ const renderChart = ({min, max, data}) => {
 };
 
 onMounted(() => {
-  chartContext = document.getElementById('chartCanvas');
+  chartContext = document.getElementById('lineChartCanvas');
 
   const max = props.data[0] + props.data[0] * .01;
   const min = props.data[props.data.length - 1] - props.data[props.data.length - 1] * .01;
-
   renderChart({min, max, data: props.data});
 });
 
@@ -97,7 +96,8 @@ onUpdated(() => {
 
 </script>
 <template>
-  <el-row>
-    <canvas id="chartCanvas"></canvas>
-  </el-row>
+  <div>
+    <canvas id="lineChartCanvas"
+            style="position: relative; height:40vh; width:80vw"></canvas>
+  </div>
 </template>
