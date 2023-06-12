@@ -1,7 +1,7 @@
 {
   "name": "socrates-web",
   "private": true,
-  "version": "0.0.13",
+  "version": "0.0.14",
   "type": "module",
   "homepage": "https://soil-and-land.github.io/socrates-web/",
   "scripts": {
@@ -12,6 +12,7 @@
   "dependencies": {
     "chart.js": "^4.3.0",
     "element-plus": "^2.3.5",
+    "lodash": "^4.17.21",
     "vue": "^3.2.47",
     "vue-chartjs": "^5.2.0",
     "vue-router": "^4.2.1"

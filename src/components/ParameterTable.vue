@@ -22,9 +22,6 @@ onMounted(() => {
         </el-input>
       </el-col>
     </el-row>
-<!--    <el-row>-->
-<!--      <el-button class="mt-4 w-full" @click="addParameter">Add Parameter</el-button>-->
-<!--    </el-row>-->
     <div class="parameter-error"></div>
   </div>
 </template>

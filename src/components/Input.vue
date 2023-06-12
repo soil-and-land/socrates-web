@@ -1,6 +1,7 @@
 <script setup lang="js">
 import {reactive, ref, toRaw} from 'vue'
 import Defaults from '../defaults.js';
+import {isEmpty} from 'lodash';
 
 import {run, sampleData} from '../model.service';
 
@@ -13,6 +14,14 @@ const state = reactive({
   periodLength: 0,
   rotationLength: 0,
   climateMethodDataEntry: null,
+  monthRainTemp: [{
+    rainfall: 0,
+    temperature: 0
+  }],
+  annualRainfall: [{
+    rainfall: 0,
+  }],
+  annualYields: [],
   averageAnnualRainFall: 0,
   annualMeanTemperature: 0,
   randomizeRainAndTemperature: 0,
@@ -33,7 +42,10 @@ const state = reactive({
     climate: {},
     rotation: {},
     yields: {}
-  }
+  },
+  toggleAnnualYields: false,
+  toggleMonthlyClimate: false,
+  toggleYearlyClimate: false
 });
 const count = ref(0)
 const soils = [
@@ -116,8 +128,8 @@ function socratesToData() {
     state.socrates.climate['average_annual_rainfall'] = parseFloat(state.averageAnnualRainFall);
     state.socrates.climate['annual_mean_temperature'] = parseFloat(state.annualMeanTemperature);
     state.socrates.climate['randomize_rain_and_temperature'] = state.randomizeRainAndTemperature;
-    state.socrates.climate['annual_rainfall'] = parseFloat(state.annualRainFall);
-    state.socrates.climate['month_rain_temp'] = parseFloat(state.monthRainTemp);
+    state.socrates.climate['annual_rainfall'] = state.annualRainfall;
+    state.socrates.climate['month_rain_temp'] = state.monthRainTemp;
     state.socrates.rotation = [];
     for (let rotation of state.rotationTable) {
       state.socrates.rotation.push({
@@ -148,8 +160,8 @@ function dataToSocrates() {
     state.averageAnnualRainFall = state.socrates.climate.average_annual_rainfall;
     state.annualMeanTemperature = state.socrates.climate.annual_mean_temperature;
     state.randomizeRainAndTemperature = state.socrates.climate.randomize_rain_and_temperature;
-    state.annualRainFall = state.socrates.climate.annual_rainfall; // TODO
-    state.monthRainTemp = state.socrates.climate.month_rain_temp; // TODO
+    state.annualRainfall = state.socrates.climate.annual_rainfall;
+    state.monthRainTemp = state.socrates.climate.month_rain_temp;
     state.rotationTable = state.socrates.rotation;
     state.yieldsMethodDataEntry = state.socrates.yields.yields_method_data_entry;
     state.annualYields = state.socrates.yields.annual_yields;
@@ -176,9 +188,45 @@ function addRotation() {
   });
 }
 
+function selectYield(yieldOption) {
+  state.yieldsMethodDataEntry = yieldOption;
+}
+
+function updateRainfall({$event, key}) {
+  if (!state.annualRainfall[key]) {
+    state.annualRainfall[key] = {rainfall: parseInt($event)};
+  } else {
+    state.annualRainfall[key].rainfall = parseInt($event);
+  }
+}
+
+function updateYields({$event, key}) {
+  const obj = {};
+  obj['yield'] = parseInt($event);
+  state.annualYields[key] = obj;
+}
+
+function updateMonthRainTemps({$event, index, key}) {
+  const obj = {};
+
+  if (isEmpty(state.monthRainTemp?.[index]?.rainfall)) {
+    obj['rainfall'] = 0;
+  }
+  if (key === 'rainfall') {
+    obj['rainfall'] = $event;
+  }
+  if (isEmpty(state.monthRainTemp?.[index]?.temperature)) {
+    obj['temperature'] = 0;
+  }
+  if (key === 'temperature') {
+    obj['temperature'] = $event;
+  }
+  state.monthRainTemp[index] = obj;
+}
 </script>
 
 <template>
+  <div class="mx-4">
   <el-row :gutter="20" class="flex flex-col justify-center items-center">
     <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
       <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
@@ -279,23 +327,47 @@ function addRotation() {
                     label="Enter monthly rainfall & mean temperature"
                     :value="4"/>
               </el-select>
+              <el-button v-if="state.climateMethodDataEntry===4"
+                         @click="state.toggleMonthlyClimate = !state.toggleMonthlyClimate">
+                {{ state.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
+              </el-button>
+              <el-button v-if="state.climateMethodDataEntry===0"
+                         @click="state.toggleYearlyClimate = !state.toggleYearlyClimate">
+                {{ state.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
+              </el-button>
             </div>
           </el-col>
           <el-col class="py-1">
             <span class="input-group-addon">
-                            <a href="#" id="climateEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
-                        </span>
+              <a href="#" id="climateEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
+            </span>
+          </el-col>
+          <el-col class="py-1" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <el-row v-if="state.climateMethodDataEntry===4" v-show="state.toggleMonthlyClimate">
+              <monthly-table :monthRainTemp="state.monthRainTemp"
+                             :periodLength="state.periodLength"
+                             :startYear="state.startYear"
+                             @updateMonthRainTemps="updateMonthRainTemps"/>
+            </el-row>
+            <el-row v-if="state.climateMethodDataEntry===0" v-show="state.toggleYearlyClimate">
+              <yearly-table :annualRainfall="state.annualRainfall"
+                            :periodLength="state.periodLength"
+                            :startYear="state.startYear"
+                            @updateAnnualRainfall="updateRainfall"/>
+            </el-row>
           </el-col>
           <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.averageAnnualRainFall" placeholder="Rain">
+              <el-input v-model="state.averageAnnualRainFall" placeholder="Rain"
+                        :disabled="state.climateMethodDataEntry===4 || state.climateMethodDataEntry===0">
                 <template #prepend>Average annual rainfall (mm)</template>
               </el-input>
             </div>
           </el-col>
           <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.annualMeanTemperature" placeholder="Temperature">
+              <el-input v-model="state.annualMeanTemperature" placeholder="Temperature"
+                        :disabled="state.climateMethodDataEntry===4 || state.climateMethodDataEntry===0">
                 <template #prepend>Annual mean temperature (&#x2103;)</template>
               </el-input>
             </div>
@@ -388,7 +460,8 @@ function addRotation() {
             <div>
               <span class="input-group-addon">Method of entering yield</span>
               <el-select v-model="state.yieldsMethodDataEntry"
-                         class="m-2" placeholder="Select">
+                         class="m-2" placeholder="Select"
+                         @change="selectYield">
                 <el-option
                     label="Enter annual yields manually"
                     :value="0"/>
@@ -399,8 +472,18 @@ function addRotation() {
               <span class="input-group-addon">
               <a href="#" id="yieldEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
             </span>
+              <el-button v-if="state.yieldsMethodDataEntry===0"
+                         @click="state.toggleAnnualYields = !state.toggleAnnualYields">
+                {{ state.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
+              </el-button>
             </div>
           </el-col>
+        </el-row>
+        <el-row v-show="state.toggleAnnualYields">
+          <yields-table :annualYields="state.annualYields"
+                        :startYear="state.startYear"
+                        :periodLength="state.periodLength"
+                        @updateYields="updateYields"/>
         </el-row>
       </div>
       <el-col :span="24" class="py-10" v-if="state.errors">
@@ -444,6 +527,7 @@ function addRotation() {
     </el-col>
   </el-row>
   <el-row class="pb-20"></el-row>
+  </div>
 </template>
 
 <style scoped>
