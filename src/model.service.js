@@ -1,4 +1,5 @@
 export async function run({socrates, parameters}) {
+  // let response = await fetch("/run", { // For debugging local
   let response = await fetch("https://api.socrates-soil.net/run", {
     method: "POST",
     headers: {

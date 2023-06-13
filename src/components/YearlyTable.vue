@@ -60,5 +60,8 @@ function updateValues(index, value){
         </el-input>
       </el-col>
     </el-row>
+    <el-row v-else>
+      <p>Add <span class="font-bold">Simulation period in years</span></p>
+    </el-row>
   </div>
 </template>

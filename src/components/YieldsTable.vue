@@ -36,7 +36,7 @@ function updateValues(index, value){
     <el-row class="">
       <el-col :span="24" class="p-2 text-center">Annual Yields</el-col>
     </el-row>
-    <el-row v-if="parseInt(props.periodLength) > 0  && parseInt(props.startYear)"
+    <el-row v-if="parseInt(props.periodLength) > 0  && props.startYear"
             v-for="(value, key, index) in state.annualYields"
             :key="index">
       <el-col :span="24" class="p-2">
@@ -45,6 +45,9 @@ function updateValues(index, value){
           <template #prepend>{{ value.year }}</template>
         </el-input>
       </el-col>
+    </el-row>
+    <el-row v-else>
+      <p>Add <span class="font-bold">Simulation period in years</span> and <span class="font-bold">Start Year</span></p>
     </el-row>
   </div>
 </template>
