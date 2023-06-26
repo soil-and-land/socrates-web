@@ -15,7 +15,7 @@ onMounted(() => {
     <el-row class="">
       <el-col :span="8" class="p-2 text-center">Parameter</el-col>
     </el-row>
-    <el-row v-for="(index) in state.parameters" :key="index" class="">
+    <el-row v-for="(value, index) in state.parameters" :key="index" class="">
       <el-col :span="8" class="p-2">
         <el-input v-model="state.parameters[index]">
           <template #prepend>{{index}}</template>

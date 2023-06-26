@@ -1,53 +1,51 @@
 <script setup lang="js">
-import {computed, reactive, watch} from 'vue'
+import {computed, reactive, onBeforeMount} from 'vue'
 import {isEmpty} from 'lodash';
 
 const props = defineProps(['monthRainTemp', 'periodLength', 'startYear']);
+
 const state = reactive({
   monthRainTemp: []
 });
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
 ];
+
 const emit = defineEmits(['updateMonthRainTemps']);
 
-state.monthRainTemp = computed(() => {
+onBeforeMount(() => {
   const monthRainTemp = [];
   for (let v = 0; v < months.length; v++) {
     const obj = {};
     if (isEmpty(props.monthRainTemp?.[v]?.rainfall)) {
       obj['rainfall'] = 0;
     } else {
-      obj['rainfall'] = props.monthRainTemp?.[v]?.rainfall;
+      obj['rainfall'] = parseFloat(props.monthRainTemp?.[v]?.rainfall);
     }
     if (isEmpty(props.monthRainTemp?.[v]?.temperature)) {
       obj['temperature'] = 0;
     } else {
-      obj['temperature'] = props.monthRainTemp?.[v]?.temperature;
+      obj['temperature'] = parseFloat(props.monthRainTemp?.[v]?.temperature);
     }
     monthRainTemp.push(obj);
   }
-  return monthRainTemp;
+  state.monthRainTemp = monthRainTemp;
 });
 
 function updateMonthRainTemp({$event, index, key}) {
   updateValues($event, index, key);
-  emit('updateMonthRainTemps', {$event, index, key});
+  emit('updateMonthRainTemps', {monthRainTemp: state.monthRainTemp});
 }
 
 function updateValues($event, index, key) {
-  const obj = {};
-  if (isEmpty(state.monthRainTemp?.[index]?.rainfall)) {
-    obj['rainfall'] = 0;
-  } else if (key === 'rainfall') {
-    obj['rainfall'] = $event;
+  if (state.monthRainTemp[index]) {
+    if (key === 'rainfall') {
+      state.monthRainTemp[index].rainfall = $event;
+    }
+    if (key === 'temperature') {
+      state.monthRainTemp[index].temperature = $event;
+    }
   }
-  if (isEmpty(state.monthRainTemp?.[index]?.temperature)) {
-    obj['temperature'] = 0;
-  } else if (key === 'temperature') {
-    obj['temperature'] = $event;
-  }
-  state.monthRainTemp[index] = obj;
 }
 
 </script>

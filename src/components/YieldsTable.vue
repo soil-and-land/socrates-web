@@ -1,5 +1,5 @@
 <script setup lang="js">
-import {computed, reactive} from 'vue'
+import {computed, onBeforeMount, reactive, watch} from 'vue'
 import {isEmpty} from 'lodash';
 
 const props = defineProps(['annualYields', 'startYear', 'periodLength']);
@@ -7,7 +7,7 @@ const state = reactive({
   annualYields: []
 });
 const emit = defineEmits(['updateYields']);
-state.annualYields = computed(() => {
+onBeforeMount(() => {
   const annualYields = [];
   for (let v = 0; v < props.periodLength; v++) {
     annualYields.push({
@@ -16,19 +16,28 @@ state.annualYields = computed(() => {
       yield: props.annualYields?.[v]?.yield || 0
     });
   }
-  return annualYields;
+  state.annualYields = annualYields;
 });
+
+watch(() => props.periodLength, (periodLength) => {
+  //If periodLength is changed reset the annualYields
+  state.annualYields = [];
+  for (let v = 0; v < props.periodLength; v++) {
+    state.annualYields.push({
+      year: parseInt(props.startYear) + v,
+      rotation: state.annualYields?.[v]?.rotation || null,
+      yield: state.annualYields?.[v]?.yield || 0
+    });
+  }
+}, {immediate: true});
 
 function updateYield({$event, key}) {
   updateValues($event, key);
-  emit('updateYields', {$event, key});
+  emit('updateYields', {annualYields: state.annualYields});
 }
-function updateValues(index, value){
-  if (isEmpty(props.annualYields?.[index]?.yield)){
-    state.annualYields[index] = {'yield': 0};
-  } else {
-    state.annualYields[index]['yield'] = value;
-  }
+
+function updateValues(value, index) {
+  state.annualYields[index]['yield'] = value;
 }
 </script>
 <template>

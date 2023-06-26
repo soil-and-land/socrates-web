@@ -1,44 +1,41 @@
 <script setup lang="js">
-import {computed, onMounted, onUpdated, reactive, watch} from 'vue'
+import {computed, onBeforeMount, onMounted, onUpdated, reactive, watch} from 'vue'
 
 const props = defineProps(['annualRainfall', 'periodLength', 'startYear']);
 const state = reactive({
   annualRainfall: props.annualRainfall
 });
 const emit = defineEmits(['updateAnnualRainfall']);
-watch(() => props.annualRainfall, (annualRainfall) => {
+
+onBeforeMount(() => {
   if (parseInt(props.periodLength) > 0) {
     for (let v = 0; v < props.periodLength; v++) {
-      updateValues(v, props.annualRainfall?.[v]?.rainfall);
+      if(props.annualRainfall?.[v]?.rainfall) {
+        updateValues(v, props.annualRainfall?.[v]?.rainfall);
+      }
     }
+  }
+});
+
+watch(() => props.periodLength, (periodLength) => {
+  //If periodLength is changed reset the rainfall
+  for (let v = 0; v < props.periodLength; v++) {
+    state.annualRainfall[v] = {'rainfall': 0};
   }
 }, {immediate: true});
 
 
 function updateRainfall({$event, key}) {
   updateValues($event, key);
-  emit('updateAnnualRainfall', {$event, key});
+  emit('updateAnnualRainfall', {annualRainfall: state.annualRainfall});
 }
 
-function updateValues(index, value){
-  if (!props.annualRainfall?.[index]?.rainfall) {
-    state.annualRainfall[index] = {'rainfall': 0};
-  } else {
+function updateValues(value, index) {
+  if (state.annualRainfall[index]) {
     state.annualRainfall[index]['rainfall'] = value;
   }
 }
 
-// state.annualRainfall = computed({
-//   get() {
-//     const annualRainfall = [];
-//     for (let v = 0; v < props.periodLength; v++) {
-//       annualRainfall.push({
-//         rainfall: props.annualRainfall?.[v]?.rainfall || 0,
-//       });
-//     }
-//     return annualRainfall;
-//   }
-// });
 </script>
 <template>
   <div class="flex flex-col">

@@ -90,13 +90,10 @@ const sendForm = async () => {
       parameters: toRaw(state.parameters)
     });
     state.results = results.run;
+    scrollToTop('resultsOfInputPage');
   } catch (e) {
     state.errors = e.message
   }
-}
-
-function saveData() {
-  console.log('saveData')
 }
 
 const loadData = async () => {
@@ -123,8 +120,17 @@ function socratesToData() {
     state.socrates.climate['average_annual_rainfall'] = parseFloat(state.averageAnnualRainFall);
     state.socrates.climate['annual_mean_temperature'] = parseFloat(state.annualMeanTemperature);
     state.socrates.climate['randomize_rain_and_temperature'] = state.randomizeRainAndTemperature;
-    state.socrates.climate['annual_rainfall'] = state.annualRainfall;
-    state.socrates.climate['month_rain_temp'] = state.monthRainTemp;
+    state.socrates.climate['annual_rainfall'] = [];
+    for (let r of state.annualRainfall) {
+      state.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
+    }
+    state.socrates.climate['month_rain_temp'] = [];
+    for (let mrt of state.monthRainTemp) {
+      state.socrates.climate['month_rain_temp'].push({
+        rainfall: parseFloat(mrt?.rainfall),
+        temperature: parseFloat(mrt?.temperature)
+      });
+    }
     state.socrates.rotation = [];
     for (let rotation of state.rotationTable) {
       state.socrates.rotation.push({
@@ -136,7 +142,14 @@ function socratesToData() {
       })
     }
     state.socrates.yields['yields_method_data_entry'] = state.yieldsMethodDataEntry;
-    state.socrates.yields['annual_yields'] = state.annualYields;
+    state.socrates.yields['annual_yields'] = [];
+    for (let y of state.annualYields) {
+      state.socrates.yields['annual_yields'].push({
+        year: y?.year,
+        rotation: y?.rotation,
+        yield: parseFloat(y['yield'])
+      });
+    }
   } catch (e) {
     state.errors = e.message;
   }
@@ -166,17 +179,52 @@ function dataToSocrates() {
 }
 
 function clearForm() {
-
+  state.soilProperties = {id: 0, type: 'clay', name: 'clay'};
+  state.clay = 0;
+  state.cec = 0;
+  state.initialOC = 0;
+  state.startYear = 0;
+  state.periodLength = 0;
+  state.rotationLength = 0;
+  state.climateMethodDataEntry = null;
+  state.monthRainTemp = [{
+    rainfall: 0,
+    temperature: 0
+  }];
+  state.annualRainfall = [{
+    rainfall: 0,
+  }];
+  state.annualYields = [];
+  state.averageAnnualRainFall = 0;
+  state.annualMeanTemperature = 0;
+  state.randomizeRainAndTemperature = 0;
+  state.rotationTable = [];
+  state.yieldsMethodDataEntry = 0;
+  state.parameters = Defaults.parameters;
+  state.showParameters = false;
+  state.results = null;
+  state.socrates = {
+    soil: {},
+    simulation: {},
+    climate: {},
+    rotation: {},
+    yields: {}
+  };
+  state.toggleAnnualYields = false;
+  state.toggleMonthlyClimate = false;
+  state.toggleYearlyClimate = false;
+  state.rotationTableMessage = null;
 }
 
 const deleteRotation = (index) => {
-  state.rotationTable.splice(index, 1)
+  state.rotationTable.splice(index, 1);
+  state.rotationLength--;
 }
 
-function addRotation(event) {
+function updateRotation(event) {
   if (event) {
-    const lenght = parseInt(event);
-    for (let e = 0; e < lenght; e++) {
+    state.rotationLength = parseInt(event);
+    for (let e = 0; e < state.rotationLength; e++) {
       state.rotationTable.push({
         year: e + 1,
         plant: '',
@@ -185,21 +233,24 @@ function addRotation(event) {
         fertiliser: ''
       });
     }
-  } else {
-    state.rotationTable.push({
-      year: '',
-      plant: '',
-      stubble: '',
-      graze: '',
-      fertiliser: ''
-    });
   }
+}
+
+function addRotation() {
+  state.rotationLength++;
+  state.rotationTable.push({
+    year: state.rotationLength,
+    plant: '',
+    stubble: '',
+    graze: '',
+    fertiliser: ''
+  });
 }
 
 function updateRotationLength(event) {
   if (state.rotationTable.length !== event) {
     state.rotationTable = []; // This will clear the rotation table
-    addRotation(event);
+    updateRotation(event);
     state.rotationTableMessage = null;
   } else {
     state.rotationTableMessage = 'Rotation Length differs from rotation table, please adjust';
@@ -210,42 +261,32 @@ function selectYield(yieldOption) {
   state.yieldsMethodDataEntry = yieldOption;
 }
 
-function updateRainfall({$event, key}) {
-  if (!state.annualRainfall[key]) {
-    state.annualRainfall[key] = {rainfall: parseInt($event)};
-  } else {
-    state.annualRainfall[key].rainfall = parseInt($event);
-  }
+function updateRainfall({annualRainfall}) {
+  state.annualRainfall = annualRainfall;
 }
 
-function updateYields({$event, key}) {
-  const obj = {};
-  obj['yield'] = parseInt($event);
-  state.annualYields[key] = obj;
+function updateYields({annualYields}) {
+  state.annualYields = annualYields;
 }
 
-function updateMonthRainTemps({$event, index, key}) {
-  const obj = {};
-
-  if (isEmpty(state.monthRainTemp?.[index]?.rainfall)) {
-    obj['rainfall'] = 0;
-  }
-  if (key === 'rainfall') {
-    obj['rainfall'] = $event;
-  }
-  if (isEmpty(state.monthRainTemp?.[index]?.temperature)) {
-    obj['temperature'] = 0;
-  }
-  if (key === 'temperature') {
-    obj['temperature'] = $event;
-  }
-  state.monthRainTemp[index] = obj;
+function updateMonthRainTemps({monthRainTemp}) {
+  state.monthRainTemp = monthRainTemp;
 }
 
+function saveResults() {
+
+}
+
+function scrollToTop(id) {
+  setTimeout(function () {
+    // window.scroll({top: 0, left:0, behavior: 'smooth'});
+    document.getElementById(id).scrollIntoView({behavior: 'smooth'});
+  }, 100);
+}
 </script>
 
 <template>
-  <div class="mx-4">
+  <div class="mx-4" id="topOfInputPage">
     <el-row :gutter="20" class="flex flex-col justify-center items-center">
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
         <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
@@ -464,6 +505,7 @@ function updateMonthRainTemps({$event, index, key}) {
             </el-col>
             <el-col :span="2" class="p-2">
               <el-button
+                  v-if="idx===state.rotationLength-1"
                   link
                   type="primary"
                   size="small"
@@ -521,17 +563,12 @@ function updateMonthRainTemps({$event, index, key}) {
               class="py-10">
         <div>
           <el-button @click="sendForm()">Run</el-button>
-          <el-button @click="saveData()">Save
-            Data
-          </el-button>
-          <el-button @click="loadData()" data-toggle="modal">Load
-            Data
-          </el-button>
+          <el-button @click="loadData()" data-toggle="modal">Load Sample Data</el-button>
           <el-button @click="clearForm()">Clear Form</el-button>
         </div>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="state.results">
+              v-if="state.results" id="resultsOfInputPage">
         <el-row :span="24" class="max-h-[600px]">
           <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="state.results.years"
                       :data="state.results.organic_carbon.data_points"/>
@@ -549,6 +586,13 @@ function updateMonthRainTemps({$event, index, key}) {
               v-if="state.results">
         <pie-chart :label="'Total greenhouse gas emissions'"
                    :data="state.results"/>
+      </el-col>
+      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+              class="py-10" v-if="state.results">
+        <div>
+          <el-button @click="saveResults()" data-toggle="modal">Save Results</el-button>
+          <el-button @click="scrollToTop('topOfInputPage')">Scroll to Top</el-button>
+        </div>
       </el-col>
     </el-row>
     <el-row class="pb-20"></el-row>

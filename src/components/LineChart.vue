@@ -30,7 +30,7 @@ const renderChart = ({min, max}) => {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       lineTension: 0,
       scales: {
         y: {
@@ -96,6 +96,9 @@ onUpdated(() => {
 
 </script>
 <template>
+  <div class="grid">
+    <h3 class="justify-self-center text-3xl">Results</h3>
+  </div>
   <div>
     <canvas id="lineChartCanvas"
             style="position: relative; height:40vh; width:80vw"></canvas>

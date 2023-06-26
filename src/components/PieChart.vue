@@ -99,7 +99,9 @@ onUpdated(() => {
 
 </script>
 <template>
-  <h3 class="center text-3xl">{{ props.label }}</h3>
+  <div class="grid">
+    <h3 class="justify-self-center text-3xl">{{ props.label }}</h3>
+  </div>
   <canvas id="pieChartCanvas"
           style="position: relative; height:20vh; width:50vw"></canvas>
 </template>
