@@ -28,7 +28,7 @@ const state = reactive({
   randomizeRainAndTemperature: 0,
   rotationTable: [],
   yieldsMethodDataEntry: 0,
-  parameters: Defaults.parameters,
+  parameters: Defaults.getParameters(),
   showParameters: false,
   results: null,
   socrates: {
@@ -84,6 +84,7 @@ const rotationTableColumns = [
 const sendForm = async () => {
   console.log('run');
   socratesToData();
+  validateParameters();
   state.errors = null;
   try {
     const results = await run({
@@ -156,6 +157,12 @@ function socratesToData() {
   }
 }
 
+function validateParameters() {
+  for (let p of Object.keys(state.parameters)) {
+    state.parameters[p] = parseFloat(state.parameters[p]);
+  }
+}
+
 function dataToSocrates() {
   try {
     state.soilProperties = soils[state.socrates.soil.soil_properties]
@@ -201,7 +208,6 @@ function clearForm() {
   state.randomizeRainAndTemperature = 0;
   state.rotationTable = [];
   state.yieldsMethodDataEntry = 0;
-  state.parameters = Defaults.parameters;
   state.showParameters = false;
   state.results = null;
   state.socrates = {
@@ -277,7 +283,7 @@ function updateMonthRainTemps({monthRainTemp}) {
 async function saveResults() {
   const csv = await toCSV({results: state.results, initialOC: state.initialOC});
   const exportedFilenmae = 'data.csv';
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
   if (navigator.msSaveBlob) { // IE 10+
     navigator.msSaveBlob(blob, exportedFilenmae);
   } else {
@@ -301,6 +307,10 @@ function scrollToTop(id) {
     document.getElementById(id).scrollIntoView({behavior: 'smooth'});
   }, 100);
 }
+
+function resetParameters() {
+  state.parameters = Defaults.getParameters();
+}
 </script>
 
 <template>
@@ -321,6 +331,9 @@ function scrollToTop(id) {
         </el-button>
         <div v-show="state.showParameters">
           <h3>Parameters Table</h3>
+          <p>
+            <el-button @click="resetParameters()">Reset Parameters</el-button>
+          </p>
           <parameter-table :parameters="state.parameters"/>
         </div>
         <h3>Soil</h3>
