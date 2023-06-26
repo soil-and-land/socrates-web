@@ -4,6 +4,7 @@ import Defaults from '../defaults.js';
 import {isEmpty} from 'lodash';
 
 import {run, sampleData} from '../model.service';
+import {toCSV} from "~/export.service.js";
 
 const state = reactive({
   soilProperties: {id: 0, type: 'clay', name: 'clay'},
@@ -273,8 +274,25 @@ function updateMonthRainTemps({monthRainTemp}) {
   state.monthRainTemp = monthRainTemp;
 }
 
-function saveResults() {
-
+async function saveResults() {
+  const csv = await toCSV({results: state.results, initialOC: state.initialOC});
+  const exportedFilenmae = 'data.csv';
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  if (navigator.msSaveBlob) { // IE 10+
+    navigator.msSaveBlob(blob, exportedFilenmae);
+  } else {
+    const link = document.createElement("a");
+    if (link.download !== undefined) { // feature detection
+      // Browsers that support HTML5 download attribute
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", exportedFilenmae);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
 }
 
 function scrollToTop(id) {

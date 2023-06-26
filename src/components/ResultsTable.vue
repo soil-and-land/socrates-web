@@ -8,7 +8,7 @@ const data = computed(() => {
   data.push({
     year: results.years[0] - 1,
     oc: props.initialOC
-  })
+  });
   for (let index = 0; index < results.years.length; index++) {
     data.push({
       year: results.years[index],
@@ -27,7 +27,7 @@ const data = computed(() => {
       n2o_urine: results.n2o.urine[index],
       ch4_animal: results.ch4.animal[index],
       total: results.total[index],
-    })
+    });
   }
   return data;
 });
