@@ -1,7 +1,6 @@
 <script setup lang="js">
 import {reactive, ref, toRaw} from 'vue'
 import Defaults from '../defaults.js';
-import {isEmpty} from 'lodash';
 
 import {run, sampleData} from '../model.service';
 import {toCSV} from "~/export.service.js";
@@ -282,17 +281,17 @@ function updateMonthRainTemps({monthRainTemp}) {
 
 async function saveResults() {
   const csv = await toCSV({results: state.results, initialOC: state.initialOC});
-  const exportedFilenmae = 'data.csv';
+  const exportedFilename = 'data.csv';
   const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
   if (navigator.msSaveBlob) { // IE 10+
-    navigator.msSaveBlob(blob, exportedFilenmae);
+    navigator.msSaveBlob(blob, exportedFilename);
   } else {
     const link = document.createElement("a");
     if (link.download !== undefined) { // feature detection
       // Browsers that support HTML5 download attribute
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", exportedFilenmae);
+      link.setAttribute("download", exportedFilename);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -581,6 +580,9 @@ function resetParameters() {
             <yields-table :annualYields="state.annualYields"
                           :startYear="state.startYear"
                           :periodLength="state.periodLength"
+                          :rotationLenght="state.rotationTable.length"
+                          :rotationTable="state.rotationTable"
+                          :plants="plants"
                           @updateYields="updateYields"/>
           </el-row>
         </div>

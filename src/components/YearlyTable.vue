@@ -19,7 +19,7 @@ onBeforeMount(() => {
 
 watch(() => props.periodLength, (periodLength) => {
   //If periodLength is changed reset the rainfall
-  for (let v = 0; v < props.periodLength; v++) {
+  for (let v = 0; v < parseInt(props.periodLength); v++) {
     state.annualRainfall[v] = {'rainfall': 0};
   }
 }, {immediate: true});

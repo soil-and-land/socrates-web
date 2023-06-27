@@ -1,34 +1,43 @@
 <script setup lang="js">
-import {computed, onBeforeMount, reactive, watch} from 'vue'
+import {computed, onBeforeMount, onUpdated, reactive, watch} from 'vue'
 import {isEmpty} from 'lodash';
 
-const props = defineProps(['annualYields', 'startYear', 'periodLength']);
+const props = defineProps(['annualYields', 'startYear', 'periodLength', 'rotationTable', 'rotationLength', 'plants']);
+
 const state = reactive({
   annualYields: []
 });
+
 const emit = defineEmits(['updateYields']);
-onBeforeMount(() => {
-  const annualYields = [];
-  for (let v = 0; v < props.periodLength; v++) {
-    annualYields.push({
-      year: parseInt(props.startYear) + v,
-      rotation: props.annualYields?.[v]?.rotation || null,
-      yield: props.annualYields?.[v]?.yield || 0
-    });
-  }
-  state.annualYields = annualYields;
-});
+watch(() => props.annualYields, (annualYields) => {
+  state.annualYields = props.annualYields;
+}, {immediate: true});
 
 watch(() => props.periodLength, (periodLength) => {
   //If periodLength is changed reset the annualYields
-  state.annualYields = [];
-  for (let v = 0; v < props.periodLength; v++) {
-    state.annualYields.push({
-      year: parseInt(props.startYear) + v,
-      rotation: state.annualYields?.[v]?.rotation || null,
-      yield: state.annualYields?.[v]?.yield || 0
-    });
+  state.annualYields = props.annualYields;
+  for (let v = 0; v < parseInt(props.periodLength); v++) {
+    if (state.annualYields[v] && props.annualYields[v]) {
+      state.annualYields[v].yield = props.annualYields[v].yield;
+    } else {
+      state.annualYields.push({
+        year: parseInt(props.startYear) + v,
+        rotation: state.annualYields?.[v]?.rotation || null,
+        yield: state.annualYields?.[v]?.yield || 0
+      });
+    }
   }
+  emit('updateYields', {annualYields: state.annualYields});
+}, {immediate: true});
+
+watch(() => props.rotationLength, (rotationLength) => {
+  updateRotation();
+  emit('updateYields', {annualYields: state.annualYields});
+}, {immediate: true});
+
+watch(() => props.rotationTable, (rotationTable) => {
+  updateRotation();
+  emit('updateYields', {annualYields: state.annualYields});
 }, {immediate: true});
 
 function updateYield({$event, key}) {
@@ -38,6 +47,21 @@ function updateYield({$event, key}) {
 
 function updateValues(value, index) {
   state.annualYields[index]['yield'] = value;
+}
+
+function updateRotation() {
+  let currentRotation = 0;
+  for (let v = 0; v < state.annualYields?.length; v++) {
+    if (props.rotationTable[currentRotation]) {
+      const thisRotation = props.rotationTable[currentRotation];
+      const plantId = thisRotation.plant.id;
+      state.annualYields[v].rotation = props.plants[plantId]?.name
+      currentRotation++;
+      if (currentRotation >= props.rotationLength) {
+        currentRotation = 0;
+      }
+    }
+  }
 }
 </script>
 <template>
