@@ -40,31 +40,33 @@ const data = computed(() => {
       <el-table-column prop="crop" label="Crop"/>
       <el-table-column prop="rain" label="Rain"/>
       <el-table-column prop="yields" label="Yield"/>
-      <el-table-column prop="biomass" label="Biomass"/>
+      <el-table-column prop="biomass" min-width="90px">
+        <template #header>Biomass</template>
+      </el-table-column>
       <el-table-column prop="nitrogen" label="Fert"/>
       <el-table-column prop="urine" label="Urine"/>
-      <el-table-column prop="oc">
+      <el-table-column prop="oc" min-width="100px">
         <template #header>OC<br/>(0-10 cm)</template>
       </el-table-column>
-      <el-table-column prop="co2">
+      <el-table-column prop="co2" min-width="100px">
         <template #header>Soil C <br/>(0-30 cm)</template>
       </el-table-column>
-      <el-table-column prop="n2o_fert">
+      <el-table-column prop="n2o_fert" min-width="100px">
         <template #header>N<sub>2</sub>O<br/>(Fertiliser)</template>
       </el-table-column>
-      <el-table-column prop="n2o_min">
+      <el-table-column prop="n2o_min" min-width="120px">
         <template #header>N<sub>2</sub>O<br/>(Mineralised)</template>
       </el-table-column>
-      <el-table-column prop="n2o_res">
+      <el-table-column prop="n2o_res" min-width="110px">
         <template #header>N<sub>2</sub>O<br/>(Residues)</template>
       </el-table-column>
-      <el-table-column prop="n2o_indirect">
+      <el-table-column prop="n2o_indirect" min-width="100px">
         <template #header>N<sub>2</sub>O<br/>(Indirect)</template>
       </el-table-column>
-      <el-table-column prop="n2o_urine">
+      <el-table-column prop="n2o_urine" min-width="90px">
         <template #header>N<sub>2</sub>O<br/>(Urine)</template>
       </el-table-column>
-      <el-table-column prop="ch4_animal">
+      <el-table-column prop="ch4_animal" min-width="90px">
         <template #header>CH<sub>4</sub><br/>(Animal)</template>
       </el-table-column>
       <el-table-column prop="total" label="TOTAL"/>
