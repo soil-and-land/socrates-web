@@ -43,6 +43,9 @@ function updateValues(value, index) {
       <el-col :span="24" class="p-2 text-center text-2xl">Yearly Rain</el-col>
     </el-row>
     <el-row>
+      <el-alert title="Error: If all monthly rainfall values are zero, float division by zero" type="info" />
+    </el-row>
+    <el-row>
       <el-col :span="6" class="p-2 font-bold">Year</el-col>
       <el-col :span="18" class="p-2 font-bold">Rainfall (mm)</el-col>
     </el-row>

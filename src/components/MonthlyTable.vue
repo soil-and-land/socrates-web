@@ -30,6 +30,7 @@ onBeforeMount(() => {
     monthRainTemp.push(obj);
   }
   state.monthRainTemp = monthRainTemp;
+  emit('updateMonthRainTemps', {monthRainTemp: state.monthRainTemp});
 });
 
 function updateMonthRainTemp({$event, index, key}) {
@@ -53,6 +54,9 @@ function updateValues($event, index, key) {
   <div>
     <el-row class="">
       <el-col :span="24" class="p-2 text-center text-2xl">Monthly Rain Temperature</el-col>
+    </el-row>
+    <el-row>
+      <el-alert title="Error: If all monthly rainfall values are zero, float division by zero" type="info" />
     </el-row>
     <el-row>
       <el-col :span="6" class="p-2 font-bold">Month</el-col>

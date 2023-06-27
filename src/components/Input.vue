@@ -451,6 +451,9 @@ function howToNotebook() {
                       label="Enter monthly rainfall & mean temperature"
                       :value="4"/>
                 </el-select>
+                <el-row>
+                  <el-alert title="Note: Error if rainfall value is zero" type="info" />
+                </el-row>
                 <el-button v-if="state.climateMethodDataEntry===4"
                            @click="state.toggleMonthlyClimate = !state.toggleMonthlyClimate">
                   {{ state.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
