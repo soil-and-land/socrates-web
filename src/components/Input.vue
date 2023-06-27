@@ -40,7 +40,9 @@ const state = reactive({
   toggleAnnualYields: false,
   toggleMonthlyClimate: false,
   toggleYearlyClimate: false,
-  rotationTableMessage: null
+  rotationTableMessage: null,
+  displayRunInNotebook: false,
+  jupyterNotebook: []
 });
 const count = ref(0)
 const soils = [
@@ -309,6 +311,34 @@ function scrollToTop(id) {
 
 function resetParameters() {
   state.parameters = Defaults.getParameters();
+}
+
+function howToNotebook() {
+  state.displayRunInNotebook = true;
+  const socrates_json = JSON.stringify(state.socrates);
+  const parameters_json = JSON.stringify(state.parameters);
+  state.jupyterSource = [
+    '!pip install requests',
+    'import os',
+    'import json',
+    'import requests',
+    "socrates_json = '''",
+    socrates_json,
+    "'''",
+    'socrates = json.loads(socrates_json)',
+    "parameters_json = '''",
+    parameters_json,
+    "'''",
+    'parameters = json.loads(parameters_json)',
+    'api_url = "https://api.socrates-soil.net/run"',
+    'payload = {',
+    "  'socrates' : socrates,",
+    "  'parameters': parameters",
+    "}",
+    "response = requests.post(api_url, json=payload)",
+    "results = response.json()",
+    "results"
+  ];
 }
 </script>
 
@@ -624,11 +654,21 @@ function resetParameters() {
               class="py-10" v-if="state.results">
         <div>
           <el-button @click="saveResults()" data-toggle="modal">Save Results</el-button>
+          <el-button v-if="state.results" @click="howToNotebook()">Run in notebook</el-button>
           <el-button @click="scrollToTop('topOfInputPage')">Scroll to Top</el-button>
         </div>
       </el-col>
     </el-row>
     <el-row class="pb-20"></el-row>
+    <el-dialog v-model="state.displayRunInNotebook" title="## Copy and Paste the following code in a jupyter notebook">
+      <div class="overflow-x-scroll">
+        <code>
+          <ul class="list-none list-inside">
+            <li v-for="row of state.jupyterSource" class="break-normal">{{ row }}</li>
+          </ul>
+        </code>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
