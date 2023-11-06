@@ -1,50 +1,15 @@
 <script setup lang="js">
-import {reactive, ref, toRaw} from 'vue'
+import {reactive, ref, toRaw} from 'vue';
+import {storeToRefs} from 'pinia';
+
 import Defaults from '../defaults.js';
 
 import {run, sampleData} from '../model.service';
 import {toCSV} from "~/export.service.js";
+import {useStore} from '../store';
 
-const state = reactive({
-  soilProperties: {id: 0, type: 'clay', name: 'clay'},
-  clay: 0,
-  cec: 0,
-  initialOC: 0,
-  startYear: 0,
-  periodLength: 0,
-  rotationLength: 0,
-  climateMethodDataEntry: null,
-  monthRainTemp: [{
-    rainfall: 0,
-    temperature: 0
-  }],
-  annualRainfall: [{
-    rainfall: 0,
-  }],
-  annualYields: [],
-  averageAnnualRainFall: 0,
-  annualMeanTemperature: 0,
-  randomizeRainAndTemperature: 0,
-  rotationTable: [],
-  yieldsMethodDataEntry: 0,
-  parameters: Defaults.getParameters(),
-  showParameters: false,
-  results: null,
-  socrates: {
-    soil: {},
-    simulation: {},
-    climate: {},
-    rotation: {},
-    yields: {}
-  },
-  toggleAnnualYields: false,
-  toggleMonthlyClimate: false,
-  toggleYearlyClimate: false,
-  rotationTableMessage: null,
-  displayRunInNotebook: false,
-  jupyterNotebook: []
-});
-const count = ref(0)
+const store = useStore();
+
 const soils = [
   {id: 0, type: 'clay', name: 'clay'},
   {id: 1, type: 'silt', name: 'silt clay'},
@@ -86,57 +51,57 @@ const sendForm = async () => {
   console.log('run');
   socratesToData();
   validateParameters();
-  state.errors = null;
+  store.errors = null;
   try {
     const results = await run({
-      socrates: toRaw(state.socrates),
-      parameters: toRaw(state.parameters)
+      socrates: toRaw(store.socrates),
+      parameters: toRaw(store.parameters)
     });
-    state.results = results.run;
+    store.results = results.run;
     scrollToTop('resultsOfInputPage');
   } catch (e) {
-    state.errors = e.message
+    store.errors = e.message
   }
 }
 
 const loadData = async () => {
   console.log('load data');
-  state.errors = null;
+  store.errors = null;
   try {
-    state.socrates = await sampleData();
+    store.socrates = await sampleData();
     dataToSocrates();
   } catch (e) {
-    state.errors = e.message
+    store.errors = e.message
   }
 }
 
 function socratesToData() {
   try {
-    state.socrates.soil['soil_properties'] = state.soilProperties;
-    state.socrates.soil['clay_percentage'] = parseFloat(state.clay);
-    state.socrates.soil['cec'] = parseFloat(state.cec);
-    state.socrates.soil['initial_oc'] = parseFloat(state.initialOC);
-    state.socrates.simulation['start_year'] = parseInt(state.startYear);
-    state.socrates.simulation['period_length'] = parseInt(state.periodLength);
-    state.socrates.simulation['rotation_length'] = parseInt(state.rotationLength);
-    state.socrates.climate['climate_method_data_entry'] = state.climateMethodDataEntry;
-    state.socrates.climate['average_annual_rainfall'] = parseFloat(state.averageAnnualRainFall);
-    state.socrates.climate['annual_mean_temperature'] = parseFloat(state.annualMeanTemperature);
-    state.socrates.climate['randomize_rain_and_temperature'] = state.randomizeRainAndTemperature;
-    state.socrates.climate['annual_rainfall'] = [];
-    for (let r of state.annualRainfall) {
-      state.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
+    store.socrates.soil['soil_properties'] = store.soilProperties;
+    store.socrates.soil['clay_percentage'] = parseFloat(store.clay);
+    store.socrates.soil['cec'] = parseFloat(store.cec);
+    store.socrates.soil['initial_oc'] = parseFloat(store.initialOC);
+    store.socrates.simulation['start_year'] = parseInt(store.startYear);
+    store.socrates.simulation['period_length'] = parseInt(store.periodLength);
+    store.socrates.simulation['rotation_length'] = parseInt(store.rotationLength);
+    store.socrates.climate['climate_method_data_entry'] = store.climateMethodDataEntry;
+    store.socrates.climate['average_annual_rainfall'] = parseFloat(store.averageAnnualRainFall);
+    store.socrates.climate['annual_mean_temperature'] = parseFloat(store.annualMeanTemperature);
+    store.socrates.climate['randomize_rain_and_temperature'] = store.randomizeRainAndTemperature;
+    store.socrates.climate['annual_rainfall'] = [];
+    for (let r of store.annualRainfall) {
+      store.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
     }
-    state.socrates.climate['month_rain_temp'] = [];
-    for (let mrt of state.monthRainTemp) {
-      state.socrates.climate['month_rain_temp'].push({
+    store.socrates.climate['month_rain_temp'] = [];
+    for (let mrt of store.monthRainTemp) {
+      store.socrates.climate['month_rain_temp'].push({
         rainfall: parseFloat(mrt?.rainfall),
         temperature: parseFloat(mrt?.temperature)
       });
     }
-    state.socrates.rotation = [];
-    for (let rotation of state.rotationTable) {
-      state.socrates.rotation.push({
+    store.socrates.rotation = [];
+    for (let rotation of store.rotationTable) {
+      store.socrates.rotation.push({
         year: parseInt(rotation['year']),
         plant: parseInt(rotation['plant']),
         stubble: parseInt(rotation['stubble']),
@@ -144,145 +109,55 @@ function socratesToData() {
         fertiliser: parseFloat(rotation['fertiliser'])
       })
     }
-    state.socrates.yields['yields_method_data_entry'] = state.yieldsMethodDataEntry;
-    state.socrates.yields['annual_yields'] = [];
-    for (let y of state.annualYields) {
-      state.socrates.yields['annual_yields'].push({
+    store.socrates.yields['yields_method_data_entry'] = store.yieldsMethodDataEntry;
+    store.socrates.yields['annual_yields'] = [];
+    for (let y of store.annualYields) {
+      store.socrates.yields['annual_yields'].push({
         year: y?.year,
         rotation: y?.rotation,
         yield: parseFloat(y['yield'])
       });
     }
   } catch (e) {
-    state.errors = e.message;
+    store.errors = e.message;
   }
 }
 
 function validateParameters() {
-  for (let p of Object.keys(state.parameters)) {
-    state.parameters[p] = parseFloat(state.parameters[p]);
+  for (let p of Object.keys(store.parameters)) {
+    store.parameters[p] = parseFloat(store.parameters[p]);
   }
 }
 
 function dataToSocrates() {
   try {
-    state.soilProperties = soils[state.socrates.soil.soil_properties]
-    state.clay = state.socrates.soil.clay_percentage;
-    state.cec = state.socrates.soil.cec;
-    state.initialOC = state.socrates.soil.initial_oc;
-    state.startYear = state.socrates.simulation.start_year;
-    state.periodLength = state.socrates.simulation.period_length;
-    state.rotationLength = state.socrates.simulation.rotation_length;
-    state.climateMethodDataEntry = state.socrates.climate.climate_method_data_entry;
-    state.averageAnnualRainFall = state.socrates.climate.average_annual_rainfall;
-    state.annualMeanTemperature = state.socrates.climate.annual_mean_temperature;
-    state.randomizeRainAndTemperature = state.socrates.climate.randomize_rain_and_temperature;
-    state.annualRainfall = state.socrates.climate.annual_rainfall;
-    state.monthRainTemp = state.socrates.climate.month_rain_temp;
-    state.rotationTable = state.socrates.rotation;
-    state.yieldsMethodDataEntry = state.socrates.yields.yields_method_data_entry;
-    state.annualYields = state.socrates.yields.annual_yields;
+    store.soilProperties = soils[store.socrates.soil.soil_properties]
+    store.clay = store.socrates.soil.clay_percentage;
+    store.cec = store.socrates.soil.cec;
+    store.initialOC = store.socrates.soil.initial_oc;
+    store.startYear = store.socrates.simulation.start_year;
+    store.periodLength = store.socrates.simulation.period_length;
+    store.rotationLength = store.socrates.simulation.rotation_length;
+    store.climateMethodDataEntry = store.socrates.climate.climate_method_data_entry;
+    store.averageAnnualRainFall = store.socrates.climate.average_annual_rainfall;
+    store.annualMeanTemperature = store.socrates.climate.annual_mean_temperature;
+    store.randomizeRainAndTemperature = store.socrates.climate.randomize_rain_and_temperature;
+    store.annualRainfall = store.socrates.climate.annual_rainfall;
+    store.monthRainTemp = store.socrates.climate.month_rain_temp;
+    store.rotationTable = store.socrates.rotation;
+    store.yieldsMethodDataEntry = store.socrates.yields.yields_method_data_entry;
+    store.annualYields = store.socrates.yields.annual_yields;
   } catch (e) {
-    state.errors = e.message;
+    store.errors = e.message;
   }
 }
 
 function clearForm() {
-  state.soilProperties = {id: 0, type: 'clay', name: 'clay'};
-  state.clay = 0;
-  state.cec = 0;
-  state.initialOC = 0;
-  state.startYear = 0;
-  state.periodLength = 0;
-  state.rotationLength = 0;
-  state.climateMethodDataEntry = null;
-  state.monthRainTemp = [{
-    rainfall: 0,
-    temperature: 0
-  }];
-  state.annualRainfall = [{
-    rainfall: 0,
-  }];
-  state.annualYields = [];
-  state.averageAnnualRainFall = 0;
-  state.annualMeanTemperature = 0;
-  state.randomizeRainAndTemperature = 0;
-  state.rotationTable = [];
-  state.yieldsMethodDataEntry = 0;
-  state.showParameters = false;
-  state.results = null;
-  state.socrates = {
-    soil: {},
-    simulation: {},
-    climate: {},
-    rotation: {},
-    yields: {}
-  };
-  state.toggleAnnualYields = false;
-  state.toggleMonthlyClimate = false;
-  state.toggleYearlyClimate = false;
-  state.rotationTableMessage = null;
-}
-
-const deleteRotation = (index) => {
-  state.rotationTable.splice(index, 1);
-  state.rotationLength--;
-}
-
-function updateRotation(event) {
-  if (event) {
-    state.rotationLength = parseInt(event);
-    for (let e = 0; e < state.rotationLength; e++) {
-      state.rotationTable.push({
-        year: e + 1,
-        plant: '',
-        stubble: '',
-        graze: '',
-        fertiliser: ''
-      });
-    }
-  }
-}
-
-function addRotation() {
-  state.rotationLength++;
-  state.rotationTable.push({
-    year: state.rotationLength,
-    plant: '',
-    stubble: '',
-    graze: '',
-    fertiliser: ''
-  });
-}
-
-function updateRotationLength(event) {
-  if (state.rotationTable.length !== event) {
-    state.rotationTable = []; // This will clear the rotation table
-    updateRotation(event);
-    state.rotationTableMessage = null;
-  } else {
-    state.rotationTableMessage = 'Rotation Length differs from rotation table, please adjust';
-  }
-}
-
-function selectYield(yieldOption) {
-  state.yieldsMethodDataEntry = yieldOption;
-}
-
-function updateRainfall({annualRainfall}) {
-  state.annualRainfall = annualRainfall;
-}
-
-function updateYields({annualYields}) {
-  state.annualYields = annualYields;
-}
-
-function updateMonthRainTemps({monthRainTemp}) {
-  state.monthRainTemp = monthRainTemp;
+  store.$reset()
 }
 
 async function saveResults() {
-  const csv = await toCSV({results: state.results, initialOC: state.initialOC});
+  const csv = await toCSV({results: store.results, initialOC: store.initialOC});
   const exportedFilename = 'data.csv';
   const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
   if (navigator.msSaveBlob) { // IE 10+
@@ -309,15 +184,11 @@ function scrollToTop(id) {
   }, 100);
 }
 
-function resetParameters() {
-  state.parameters = Defaults.getParameters();
-}
-
 function howToNotebook() {
-  state.displayRunInNotebook = true;
-  const socrates_json = JSON.stringify(state.socrates);
-  const parameters_json = JSON.stringify(state.parameters);
-  state.jupyterSource = [
+  store.displayRunInNotebook = true;
+  const socrates_json = JSON.stringify(store.socrates);
+  const parameters_json = JSON.stringify(store.parameters);
+  store.jupyterSource = [
     '!pip install requests',
     'import os',
     'import json',
@@ -345,32 +216,41 @@ function howToNotebook() {
 <template>
   <div class="mx-4" id="topOfInputPage">
     <el-row :gutter="20" class="flex flex-col justify-center items-center">
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+      <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
         <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10" v-if="state.errors">
-        <el-row>
-          <div class="errorMessages">Error: {{ state.errors }}</div>
+              class="py-10" v-if="store.errors">
+        <el-row :span="24" class="">
+          <div class="w-full bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+            <p class="font-bold">Error:</p>
+            <p class="errorMessages">{{ store.errors }}</p>
+          </div>
         </el-row>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
-        <el-button @click="state.showParameters = !state.showParameters">
-          {{ state.showParameters ? 'Hide Parameters' : 'Show Parameters' }}
+        <el-button @click="store.showParameters = !store.showParameters">
+          {{ store.showParameters ? 'Hide Parameters' : 'Show Parameters' }}
         </el-button>
-        <div v-show="state.showParameters">
+        <el-drawer v-model="store.showParameters" title="Climate" :with-header="false"
+                   direction="ltr" class="min-w-fit">
           <h3>Parameters Table</h3>
           <p>
-            <el-button @click="resetParameters()">Reset Parameters</el-button>
+            <el-button @click="store.resetParameters()">Reset Parameters</el-button>
           </p>
-          <parameter-table :parameters="state.parameters"/>
-        </div>
+          <parameter-table :parameters="store.parameters"/>
+          <template #footer>
+            <div style="flex: auto">
+              <el-button type="primary" @click="store.showParameters=false">Close</el-button>
+            </div>
+          </template>
+        </el-drawer>
         <h3>Soil</h3>
         <el-row>
           <el-col class="py-1">
             <div class="px-1">
               <span>Soil Properties</span>
-              <el-select v-model="state.soilProperties" class="m-2" placeholder="Select">
+              <el-select v-model="store.soilProperties" class="m-2" placeholder="Select">
                 <el-option v-for="soil in soils"
                            :key="soil.id"
                            :label="soil.type"
@@ -380,23 +260,23 @@ function howToNotebook() {
           </el-col>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.clay" placeholder="Clay %"
-                        :disabled="state.soilProperties !== 6">
+              <el-input v-model="store.clay" placeholder="Clay %"
+                        :disabled="store.soilProperties !== 6">
                 <template #prepend>Clay %</template>
               </el-input>
             </div>
           </el-col>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.cec" placeholder="CEC"
-                        :disabled="state.soilProperties !== 7">
+              <el-input v-model="store.cec" placeholder="CEC"
+                        :disabled="store.soilProperties !== 7">
                 <template #prepend>CEC</template>
               </el-input>
             </div>
           </el-col>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.initialOC" placeholder="OC">
+              <el-input v-model="store.initialOC" placeholder="OC">
                 <template #prepend>Initial OC %</template>
               </el-input>
             </div>
@@ -406,23 +286,23 @@ function howToNotebook() {
         <el-row>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.startYear" placeholder="(eg. 1990)">
+              <el-input v-model="store.startYear" placeholder="(eg. 1990)">
                 <template #prepend>Start year</template>
               </el-input>
             </div>
           </el-col>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.periodLength" placeholder="Period">
+              <el-input v-model="store.periodLength" placeholder="Period">
                 <template #prepend>Simulation period in years</template>
               </el-input>
             </div>
           </el-col>
           <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
             <div class="px-1">
-              <el-input v-model="state.rotationLength"
+              <el-input v-model="store.rotationLength"
                         placeholder="(eg. Peas - Wheat would be 2)"
-                        @change="updateRotationLength">
+                        @change="store.updateRotationLength">
                 <template #prepend>Length of rotation in years</template>
               </el-input>
             </div>
@@ -434,7 +314,7 @@ function howToNotebook() {
             <el-col class="py-1">
               <div class="px-1">
                 <span>Method of entering data</span>
-                <el-select v-model="state.climateMethodDataEntry" class="m-2" placeholder="Select">
+                <el-select v-model="store.climateMethodDataEntry" class="m-2" placeholder="Select">
                   <el-option
                       label="Enter yearly rainfall & mean temperature"
                       :value="0"/>
@@ -452,15 +332,15 @@ function howToNotebook() {
                       :value="4"/>
                 </el-select>
                 <el-row>
-                  <el-alert title="Note: Error if rainfall value is zero" type="info" />
+                  <el-alert title="Note: Error if rainfall value is zero" type="info"/>
                 </el-row>
-                <el-button v-if="state.climateMethodDataEntry===4"
-                           @click="state.toggleMonthlyClimate = !state.toggleMonthlyClimate">
-                  {{ state.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
+                <el-button v-if="store.climateMethodDataEntry===4"
+                           @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
+                  {{ store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
                 </el-button>
-                <el-button v-if="state.climateMethodDataEntry===0"
-                           @click="state.toggleYearlyClimate = !state.toggleYearlyClimate">
-                  {{ state.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
+                <el-button v-if="store.climateMethodDataEntry===0"
+                           @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
+                  {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
                 </el-button>
               </div>
             </el-col>
@@ -470,31 +350,43 @@ function howToNotebook() {
             </span>
             </el-col>
             <el-col class="py-1" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-              <el-row v-if="state.climateMethodDataEntry===4" v-show="state.toggleMonthlyClimate">
-                <monthly-table :monthRainTemp="state.monthRainTemp"
-                               :periodLength="state.periodLength"
-                               :startYear="state.startYear"
-                               @updateMonthRainTemps="updateMonthRainTemps"/>
-              </el-row>
-              <el-row v-if="state.climateMethodDataEntry===0" v-show="state.toggleYearlyClimate">
-                <yearly-table :annualRainfall="state.annualRainfall"
-                              :periodLength="state.periodLength"
-                              :startYear="state.startYear"
-                              @updateAnnualRainfall="updateRainfall"/>
-              </el-row>
+              <el-drawer title="Climate" v-if="store.climateMethodDataEntry===4" v-model="store.toggleMonthlyClimate"
+                         :with-header="false" direction="rtl" class="min-w-fit">
+                <monthly-table :monthRainTemp="store.monthRainTemp"
+                               :periodLength="store.periodLength"
+                               :startYear="store.startYear"
+                               @updateMonthRainTemps="store.updateMonthRainTemps"/>
+                <template #footer>
+                  <div style="flex: auto">
+                    <el-button type="primary" @click="store.toggleMonthlyClimate=false">Close</el-button>
+                  </div>
+                </template>
+              </el-drawer>
+              <el-drawer title="Climate" v-if="store.climateMethodDataEntry===0" v-model="store.toggleYearlyClimate"
+                         direction="rtl" :with-header="false" class="min-w-fit">
+                <yearly-table :annualRainfall="store.annualRainfall"
+                              :periodLength="store.periodLength"
+                              :startYear="store.startYear"
+                              @updateAnnualRainfall="store.updateRainfall"/>
+                <template #footer>
+                  <div style="flex: auto">
+                    <el-button type="primary" @click="store.toggleYearlyClimate=false">Close</el-button>
+                  </div>
+                </template>
+              </el-drawer>
             </el-col>
             <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
               <div class="px-1">
-                <el-input v-model="state.averageAnnualRainFall" placeholder="Rain"
-                          :disabled="state.climateMethodDataEntry===4 || state.climateMethodDataEntry===0">
+                <el-input v-model="store.averageAnnualRainFall" placeholder="Rain"
+                          :disabled="store.climateMethodDataEntry===4 || store.climateMethodDataEntry===0">
                   <template #prepend>Average annual rainfall (mm)</template>
                 </el-input>
               </div>
             </el-col>
             <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
               <div class="px-1">
-                <el-input v-model="state.annualMeanTemperature" placeholder="Temperature"
-                          :disabled="state.climateMethodDataEntry===4">
+                <el-input v-model="store.annualMeanTemperature" placeholder="Temperature"
+                          :disabled="store.climateMethodDataEntry===4">
                   <template #prepend>Annual mean temperature (&#x2103;)</template>
                 </el-input>
               </div>
@@ -511,7 +403,7 @@ function howToNotebook() {
             <el-col class="py-1">
               <div>
                 <span>Randomize rainfall and temperature</span>
-                <el-select v-model="state.randomizeRainAndTemperature" class="m-2" placeholder="Select">
+                <el-select v-model="store.randomizeRainAndTemperature" class="m-2" placeholder="Select">
                   <el-option
                       label="No"
                       :value="0"/>
@@ -525,7 +417,7 @@ function howToNotebook() {
         </div>
         <div>
           <h3>Rotation</h3>
-          <el-row :span="24" v-if="state.rotationTableMessage">{{ state.rotationTableMessage }}</el-row>
+          <el-row :span="24" v-if="store.rotationTableMessage">{{ store.rotationTableMessage }}</el-row>
           <el-row class="border-solid border-1 border-b-0 border-gray-200">
             <el-col :span="1" class="p-2 text-center">Year</el-col>
             <el-col :span="5" class="p-2 text-center">Plant</el-col>
@@ -534,7 +426,7 @@ function howToNotebook() {
             <el-col :span="5" class="p-2 text-center">Fertiliser</el-col>
             <el-col :span="3"></el-col>
           </el-row>
-          <el-row v-for="(rotation, idx) of state.rotationTable" :key="idx"
+          <el-row v-for="(rotation, idx) of store.rotationTable" :key="idx"
                   class="border-solid border-1 border-gray-200">
             <el-col :span="2" class="p-2">
               <el-input v-model="rotation['year']"/>
@@ -556,11 +448,14 @@ function howToNotebook() {
               </el-select>
             </el-col>
             <el-col :span="5" class="p-2">
-              <el-select v-model="rotation['graze']">
+              <el-select v-model="rotation['graze']"
+                         clearable
+                         :disabled="rotation['stubble'] === 0">
                 <el-option v-for="graze in grazes"
                            :key="graze.id"
                            :label="graze.name"
-                           :value="graze.id"/>
+                           :value="graze.id"
+                           :disabled="rotation['stubble'] === 0"/>
               </el-select>
             </el-col>
             <el-col :span="5" class="p-2">
@@ -568,18 +463,18 @@ function howToNotebook() {
             </el-col>
             <el-col :span="2" class="p-2">
               <el-button
-                  v-if="idx===state.rotationLength-1"
+                  v-if="idx===store.rotationLength-1"
                   link
                   type="primary"
                   size="small"
                   class="w-full"
-                  @click.prevent="deleteRotation(idx)">
+                  @click.prevent="store.deleteRotation(idx)">
                 Remove
               </el-button>
             </el-col>
           </el-row>
           <el-row>
-            <el-button class="mt-4 w-full" @click="addRotation">Add Rotation</el-button>
+            <el-button class="mt-4 w-full" @click="store.addRotation">Add Rotation</el-button>
           </el-row>
           <div class="rotation-error"></div>
         </div>
@@ -589,9 +484,9 @@ function howToNotebook() {
             <el-col class="py-1">
               <div>
                 <span class="input-group-addon">Method of entering yield</span>
-                <el-select v-model="state.yieldsMethodDataEntry"
+                <el-select v-model="store.yieldsMethodDataEntry"
                            class="m-2" placeholder="Select"
-                           @change="selectYield">
+                           @change="store.selectYield">
                   <el-option
                       label="Enter annual yields manually"
                       :value="0"/>
@@ -602,75 +497,92 @@ function howToNotebook() {
                 <span class="input-group-addon">
               <a href="#" id="yieldEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
             </span>
-                <el-button v-if="state.yieldsMethodDataEntry===0"
-                           @click="state.toggleAnnualYields = !state.toggleAnnualYields">
-                  {{ state.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
+                <el-button v-if="store.yieldsMethodDataEntry===0"
+                           @click="store.toggleAnnualYields = !store.toggleAnnualYields">
+                  {{ store.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
                 </el-button>
               </div>
             </el-col>
           </el-row>
-          <el-row v-show="state.toggleAnnualYields">
-            <yields-table :annualYields="state.annualYields"
-                          :startYear="state.startYear"
-                          :periodLength="state.periodLength"
-                          :rotationLenght="state.rotationTable.length"
-                          :rotationTable="state.rotationTable"
+          <el-drawer title="Annual Yields" v-model="store.toggleAnnualYields" direction="rtl" :with-header="false"
+                     class="min-w-fit">
+            <yields-table :annualYields="store.annualYields"
+                          :startYear="store.startYear"
+                          :periodLength="store.periodLength"
+                          :rotationLenght="store.rotationTable.length"
+                          :rotationTable="store.rotationTable"
                           :plants="plants"
-                          @updateYields="updateYields"/>
-          </el-row>
+                          @updateYields="store.updateYields"/>
+            <template #footer>
+              <div style="flex: auto">
+                <el-button type="primary" @click="store.toggleAnnualYields=false">Close</el-button>
+              </div>
+            </template>
+          </el-drawer>
         </div>
-        <el-col :span="24" class="py-10" v-if="state.errors">
-          <el-row>
-            <div class="errorMessages">Error: {{ state.errors }}</div>
+        <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24"
+                class="py-10" v-if="store.errors">
+          <el-row :span="24" class="flex flex-col justify-center items-center">
+            <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+              <p class="font-bold">Error:</p>
+              <p class="errorMessages">{{ store.errors }}</p>
+            </div>
           </el-row>
         </el-col>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
               class="py-10">
         <div>
-          <el-button @click="sendForm()">Run</el-button>
-          <el-button @click="loadData()" data-toggle="modal">Load Sample Data</el-button>
-          <el-button @click="clearForm()">Clear Form</el-button>
+          <el-button @click="sendForm()" size="large" type="primary">Run</el-button>
+          <el-button @click="loadData()" data-toggle="modal" size="large" type="primary">Load Sample Data</el-button>
+          <el-button @click="clearForm()" size="large" type="warning">Clear Form</el-button>
         </div>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="state.results" id="resultsOfInputPage">
+              v-if="store.results" id="resultsOfInputPage">
         <el-row :span="24" class="max-h-[600px]">
-          <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="state.results.years"
-                      :data="state.results.organic_carbon.data_points"/>
+          <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
+                      :data="store.results.organic_carbon.data_points"/>
         </el-row>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="state.results">
-        <management-table :results="state.results"/>
+              v-if="store.results">
+        <management-table :results="store.results"/>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="state.results">
-        <results-table :results="state.results" :initial-o-c="state.initialOC"/>
+              v-if="store.results">
+        <results-table :results="store.results" :initial-o-c="store.initialOC"/>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="state.results">
+              v-if="store.results">
         <pie-chart :label="'Total greenhouse gas emissions'"
-                   :data="state.results"/>
+                   :data="store.results"/>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10" v-if="state.results">
+              class="py-10" v-if="store.results">
         <div>
-          <el-button @click="saveResults()" data-toggle="modal">Save Results</el-button>
-          <el-button v-if="state.results" @click="howToNotebook()">Run in notebook</el-button>
-          <el-button @click="scrollToTop('topOfInputPage')">Scroll to Top</el-button>
+          <el-button @click="saveResults()" data-toggle="modal" size="large" type="primary">Save Results</el-button>
+          <el-button v-if="store.results" @click="howToNotebook()" size="large" type="primary">Run in notebook
+          </el-button>
+          <el-button @click="scrollToTop('topOfInputPage')" size="large" type="info">Scroll to Top</el-button>
         </div>
       </el-col>
     </el-row>
     <el-row class="pb-20"></el-row>
-    <el-dialog v-model="state.displayRunInNotebook" title="## Copy and Paste the following code in a jupyter notebook">
+    <el-dialog v-model="store.displayRunInNotebook"
+               title="## Copy and Paste the following code in a jupyter notebook ##">
       <div class="overflow-x-scroll">
         <code>
           <ul class="list-none list-inside">
-            <li v-for="row of state.jupyterSource" class="break-normal">{{ row }}</li>
+            <li v-for="row of store.jupyterSource" class="break-normal">{{ row }}</li>
           </ul>
         </code>
       </div>
+      <template #footer>
+        <div style="flex: auto">
+          <el-button type="primary" @click="store.displayRunInNotebook=false">Close</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>

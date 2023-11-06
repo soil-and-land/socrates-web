@@ -14,17 +14,15 @@ onMounted(() => {
 
 </script>
 <template>
-  <div>
     <el-row class="">
-      <el-col :span="10" class="p-2 text-center">Parameter</el-col>
+      <el-col :span="24" class="p-2 text-center text-2xl">Parameter</el-col>
     </el-row>
     <el-row v-for="(value, index) in state.parameters" :key="index" class="">
-      <el-col :span="10" class="p-2">
+      <el-col :span="24" class="p-2">
         <el-input v-model="state.parameters[index]" type="number">
           <template #prepend>{{ index }}</template>
         </el-input>
       </el-col>
     </el-row>
     <div class="parameter-error"></div>
-  </div>
 </template>
