@@ -40,7 +40,9 @@ export const useStore = defineStore({
     toggleYearlyClimate: false,
     rotationTableMessage: null,
     displayRunInNotebook: false,
-    jupyterNotebook: []
+    jupyterNotebook: [],
+    showLoadDialog: false,
+    selectedFile: null
   }),
   actions: {
     // Define your actions here

@@ -64,8 +64,8 @@ const sendForm = async () => {
   }
 }
 
-const loadData = async () => {
-  console.log('load data');
+const loadSampleData = async () => {
+  console.log('load sample data');
   store.errors = null;
   try {
     store.socrates = await sampleData();
@@ -73,11 +73,33 @@ const loadData = async () => {
   } catch (e) {
     store.errors = e.message
   }
+  store.showLoadDialog = false;
 }
+
+const loadData = (event) => {
+  store.selectedFile = event.target.files[0];
+  if (store.selectedFile) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const jsonData = JSON.parse(event.target.result);
+        if (jsonData) {
+          store.socrates = jsonData;
+          dataToSocrates();
+        }
+      } catch (error) {
+        console.error('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(store.selectedFile);
+    store.showLoadDialog = false;
+  }
+}
+
 
 function socratesToData() {
   try {
-    store.socrates.soil['soil_properties'] = store.soilProperties;
+    store.socrates.soil['soil_properties'] = store.soilProperties.id;
     store.socrates.soil['clay_percentage'] = parseFloat(store.clay);
     store.socrates.soil['cec'] = parseFloat(store.cec);
     store.socrates.soil['initial_oc'] = parseFloat(store.initialOC);
@@ -176,6 +198,23 @@ async function saveResults() {
     }
   }
 }
+
+function saveInputs() {
+  socratesToData();
+  const sc = toRaw(store.socrates);
+  const jsonString = JSON.stringify(sc, null, 2);
+  const blob = new Blob([jsonString], {type: 'application/json'});
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'socrates.json';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
 
 function scrollToTop(id) {
   setTimeout(function () {
@@ -534,8 +573,10 @@ function howToNotebook() {
               class="py-10">
         <div>
           <el-button @click="sendForm()" size="large" type="primary">Run</el-button>
-          <el-button @click="loadData()" data-toggle="modal" size="large" type="primary">Load Sample Data</el-button>
+          <el-button @click="store.showLoadDialog = true" data-toggle="modal" size="large" type="primary">Load Data
+          </el-button>
           <el-button @click="clearForm()" size="large" type="warning">Clear Form</el-button>
+          <el-button @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
         </div>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
@@ -583,6 +624,18 @@ function howToNotebook() {
           <el-button type="primary" @click="store.displayRunInNotebook=false">Close</el-button>
         </div>
       </template>
+    </el-dialog>
+    <el-dialog v-model="store.showLoadDialog" title="Load Data">
+      <el-form>
+        <input type="file" @change="loadData($event)" accept="application/json"/>
+      </el-form>
+      <br/>
+      <div class="is-align-center">or</div>
+      <br/>
+      <br/>
+      <div>
+        <el-button @click="loadSampleData()" size="large" type="primary">Load Example Data</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
