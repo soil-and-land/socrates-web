@@ -67,7 +67,7 @@ function updateRotation() {
 <template>
   <div>
     <el-row class="">
-      <el-col :span="24" class="p-2 text-center">Annual Yields</el-col>
+      <el-col :span="24" class="p-2 text-center text-2xl">Annual Yields</el-col>
     </el-row>
     <el-row v-if="parseInt(props.periodLength) > 0  && props.startYear"
             v-for="(value, key, index) in state.annualYields"
