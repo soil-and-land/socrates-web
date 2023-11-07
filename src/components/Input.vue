@@ -120,15 +120,15 @@ function socratesToData() {
       store.errors.push('Insert a value for Initial OC%');
     }
     store.socrates.simulation['start_year'] = parseInt(store.startYear);
-    if (store.socrates.simulation['start_year'] === 0) {
-      store.errors.push('Simulation Start year cannot be zero');
+    if (!store.socrates.simulation['start_year'] && store.socrates.simulation['start_year'] !== 0) {
+      store.errors.push('Simulation Start year missing');
     }
     store.socrates.simulation['period_length'] = parseInt(store.periodLength);
-    if (store.socrates.simulation['period_length'] <= 0) {
+    if ((!store.socrates.simulation['period_length'] && store.socrates.simulation['period_length'] !== 0) || store.socrates.simulation['period_length'] <= 0) {
       store.errors.push('Add simulation period in years');
     }
     store.socrates.simulation['rotation_length'] = parseInt(store.rotationLength);
-    if (store.socrates.simulation['rotation_length'] <= 0) {
+    if ((!store.socrates.simulation['rotation_length'] && store.socrates.simulation['rotation_length'] !== 0) || store.socrates.simulation['rotation_length'] < 1) {
       store.errors.push('Add length of rotation in years');
     }
     store.socrates.climate['climate_method_data_entry'] = store.climateMethodDataEntry;
@@ -139,18 +139,19 @@ function socratesToData() {
     store.socrates.climate['annual_mean_temperature'] = parseFloat(store.annualMeanTemperature);
     store.socrates.climate['randomize_rain_and_temperature'] = store.randomizeRainAndTemperature;
     store.socrates.climate['annual_rainfall'] = [];
-    for (let r of store.annualRainfall) {
-      store.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
-    }
-    if (!store.socrates.climate['randomize_rain_and_temperature'] && store.socrates.climate['randomize_rain_and_temperature'] !== 0) {
-
+    if (isIterable(store.annualRainfall)) {
+      for (let r of store.annualRainfall) {
+        store.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
+      }
     }
     store.socrates.climate['month_rain_temp'] = [];
-    for (let mrt of store.monthRainTemp) {
-      store.socrates.climate['month_rain_temp'].push({
-        rainfall: parseFloat(mrt?.rainfall),
-        temperature: parseFloat(mrt?.temperature)
-      });
+    if (isIterable(store.monthRainTemp)) {
+      for (let mrt of store.monthRainTemp) {
+        store.socrates.climate['month_rain_temp'].push({
+          rainfall: parseFloat(mrt?.rainfall),
+          temperature: parseFloat(mrt?.temperature)
+        });
+      }
     }
     store.socrates.rotation = [];
     for (let rotation of store.rotationTable) {

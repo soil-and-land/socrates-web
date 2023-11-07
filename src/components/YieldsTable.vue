@@ -69,7 +69,7 @@ function updateRotation() {
     <el-row class="">
       <el-col :span="24" class="p-2 text-center text-2xl">Annual Yields</el-col>
     </el-row>
-    <el-row v-if="parseInt(props.periodLength) > 0  && props.startYear"
+    <el-row v-if="parseInt(props.periodLength) > 0  && parseInt(props.startYear) >= 0"
             v-for="(value, key, index) in state.annualYields"
             :key="index">
       <el-col :span="24" class="p-2">
