@@ -192,6 +192,7 @@ function socratesToData() {
         }
         store.socrates.yields['annual_yields'].push(yy);
       }
+      console.log(JSON.stringify(store.annualYields));
       if (yieldErrors.length > 0) {
         yieldErrors.push('Missing: some yield values');
       }
@@ -467,9 +468,6 @@ function isIterable(obj) {
                       label="Enter monthly rainfall & mean temperature"
                       :value="4"/>
                 </el-select>
-                <el-row>
-                  <el-alert title="Note: Error if rainfall value is zero" type="info"/>
-                </el-row>
                 <el-button v-if="store.climateMethodDataEntry===4"
                            @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
                   {{ store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
