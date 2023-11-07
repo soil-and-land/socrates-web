@@ -1,0 +1,70 @@
+{
+  "soil": {
+    "soilProperties": 0,
+    "initialOC": 1
+  },
+  "simulation": {
+    "startYear": 2023,
+    "periodLength": 30,
+    "rotationLength": 4
+  },
+  "climate": {
+    "climateMethodDataEntry": 1,
+    "averageAnnualRainFall": 600,
+    "annualMeanTemperature": 18,
+    "randomizeRainAndTemperature": 0,
+    "annualRainFall": [
+      {
+        "rainfall": null
+      },
+      {
+        "rainfall": null
+      }
+    ],
+    "monthRainTemp": [
+      {
+        "rainfall": null,
+        "temperature": null
+      },
+      {
+        "rainfall": null,
+        "temperature": null
+      }
+    ]
+  },
+  "rotation": [
+    {
+      "year": 1,
+      "plant": 0,
+      "stubble": 0,
+      "graze": null,
+      "fertiliser": 100
+    },
+    {
+      "year": 2,
+      "plant": 3,
+      "stubble": 1,
+      "graze": null,
+      "fertiliser": 200
+    },
+    {
+      "year": 3,
+      "plant": 1,
+      "stubble": 1,
+      "graze": 0,
+      "fertiliser": 100
+    },
+    {
+      "year": 4,
+      "plant": 6,
+      "stubble": null,
+      "graze": null,
+      "fertiliser": null
+    }
+  ],
+  "yields": {
+    "yieldsMethodDataEntry": 1
+  },
+  "parameters": {},
+  "parametersEdited": false
+}

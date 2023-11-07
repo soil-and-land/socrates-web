@@ -4,7 +4,8 @@ import Defaults from './defaults';
 export const useStore = defineStore({
   id: 'input',
   state: () => ({
-    soilProperties: {id: 0, type: 'clay', name: 'clay'},
+    version: Defaults.version,
+    soilProperties: null,
     clay: 0,
     cec: 0,
     initialOC: 0,
@@ -42,7 +43,9 @@ export const useStore = defineStore({
     displayRunInNotebook: false,
     jupyterNotebook: [],
     showLoadDialog: false,
-    selectedFile: null
+    selectedFile: null,
+    socratesOld: {}, //To suport old versions of the json input file
+    errors: []
   }),
   actions: {
     // Define your actions here

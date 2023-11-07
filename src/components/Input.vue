@@ -7,6 +7,7 @@ import Defaults from '../defaults.js';
 import {run, sampleData} from '../model.service';
 import {toCSV} from "~/export.service.js";
 import {useStore} from '../store';
+import {isEmpty} from "lodash";
 
 const store = useStore();
 
@@ -48,71 +49,101 @@ const rotationTableColumns = [
 ]
 
 const sendForm = async () => {
-  console.log('run');
+  store.errors = [];
   socratesToData();
   validateParameters();
-  store.errors = null;
-  try {
-    const results = await run({
-      socrates: toRaw(store.socrates),
-      parameters: toRaw(store.parameters)
-    });
-    store.results = results.run;
-    scrollToTop('resultsOfInputPage');
-  } catch (e) {
-    store.errors = e.message
+  if (store.errors.length === 0) {
+    try {
+      const results = await run({
+        socrates: toRaw(store.socrates),
+        parameters: toRaw(store.parameters)
+      });
+      store.results = results.run;
+      scrollToTop('resultsOfInputPage');
+    } catch (e) {
+      store.errors.push(e.message);
+      console.error(e);
+    }
   }
 }
 
 const loadSampleData = async () => {
-  console.log('load sample data');
-  store.errors = null;
+  store.errors = [];
   try {
     store.socrates = await sampleData();
     dataToSocrates();
   } catch (e) {
-    store.errors = e.message
+    store.errors.push(e.message);
+    console.error(e);
   }
   store.showLoadDialog = false;
 }
 
 const loadData = (event) => {
   store.selectedFile = event.target.files[0];
-  if (store.selectedFile) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const jsonData = JSON.parse(event.target.result);
-        if (jsonData) {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const jsonData = JSON.parse(event.target.result);
+      if (jsonData) {
+        if (jsonData.version) {
           store.socrates = jsonData;
           dataToSocrates();
+        } else {
+          store.socratesOld = jsonData;
+          oldDataToSocrates();
         }
-      } catch (error) {
-        console.error('Invalid JSON file.');
       }
-    };
-    reader.readAsText(store.selectedFile);
-    store.showLoadDialog = false;
-  }
+    } catch (error) {
+      store.errors.push('Invalid JSON file.');
+    }
+  };
+  reader.readAsText(store.selectedFile);
+  store.showLoadDialog = false;
 }
 
 
 function socratesToData() {
   try {
-    store.socrates.soil['soil_properties'] = store.soilProperties.id;
+    store.socrates.version = store.version;
+    store.socrates.soil['soil_properties'] = parseInt(store.soilProperties);
+    if (
+        (!store.socrates.soil['soil_properties'] && store.socrates.soil['soil_properties'] !== 0) ||
+        store.socrates.soil['soil_properties'] < 0 && store.socrates.soil['soil_properties'] > 7
+    ) {
+      store.errors.push('Select soil properties');
+    }
     store.socrates.soil['clay_percentage'] = parseFloat(store.clay);
     store.socrates.soil['cec'] = parseFloat(store.cec);
     store.socrates.soil['initial_oc'] = parseFloat(store.initialOC);
+    if (store.socrates.simulation['initial_oc'] === 0) {
+      store.errors.push('Insert a value for Initial OC%');
+    }
     store.socrates.simulation['start_year'] = parseInt(store.startYear);
+    if (store.socrates.simulation['start_year'] === 0) {
+      store.errors.push('Simulation Start year cannot be zero');
+    }
     store.socrates.simulation['period_length'] = parseInt(store.periodLength);
+    if (store.socrates.simulation['period_length'] <= 0) {
+      store.errors.push('Add simulation period in years');
+    }
     store.socrates.simulation['rotation_length'] = parseInt(store.rotationLength);
+    if (store.socrates.simulation['rotation_length'] <= 0) {
+      store.errors.push('Add length of rotation in years');
+    }
     store.socrates.climate['climate_method_data_entry'] = store.climateMethodDataEntry;
+    if ((!store.socrates.climate['climate_method_data_entry'] && store.socrates.climate['climate_method_data_entry'] !== 0) || store.socrates.climate['climate_method_data_entry'] < 0) {
+      store.errors.push('Missing: Method of entering data');
+    }
     store.socrates.climate['average_annual_rainfall'] = parseFloat(store.averageAnnualRainFall);
     store.socrates.climate['annual_mean_temperature'] = parseFloat(store.annualMeanTemperature);
     store.socrates.climate['randomize_rain_and_temperature'] = store.randomizeRainAndTemperature;
     store.socrates.climate['annual_rainfall'] = [];
     for (let r of store.annualRainfall) {
       store.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
+    }
+    if (!store.socrates.climate['randomize_rain_and_temperature'] && store.socrates.climate['randomize_rain_and_temperature'] !== 0) {
+
     }
     store.socrates.climate['month_rain_temp'] = [];
     for (let mrt of store.monthRainTemp) {
@@ -123,25 +154,52 @@ function socratesToData() {
     }
     store.socrates.rotation = [];
     for (let rotation of store.rotationTable) {
-      store.socrates.rotation.push({
+      const r = {
         year: parseInt(rotation['year']),
         plant: parseInt(rotation['plant']),
         stubble: parseInt(rotation['stubble']),
         graze: parseInt(rotation['graze']),
         fertiliser: parseFloat(rotation['fertiliser'])
-      })
+      }
+      if ((!r.plant && r.plant !== 0) || r.plant < 0 || r.plant > 7) {
+        store.errors.push(`Missing or incorrect plant in rotation year #${r.year}`);
+      } else {
+        if ((!r.stubble && r.stubble !== 0)) {
+          store.errors.push(`Stubble management missing in rotation year #${r.year}`);
+        }
+        if ((!r.fertiliser && r.fertiliser !== 0)) {
+          store.errors.push(`Fertiliser missing in rotation year #${r.year}`);
+        }
+      }
+      store.socrates.rotation.push(r);
+    }
+    if (store.socrates.rotation < 1) {
+      store.errors.push('Add rotation crop');
     }
     store.socrates.yields['yields_method_data_entry'] = store.yieldsMethodDataEntry;
     store.socrates.yields['annual_yields'] = [];
-    for (let y of store.annualYields) {
-      store.socrates.yields['annual_yields'].push({
-        year: y?.year,
-        rotation: y?.rotation,
-        yield: parseFloat(y['yield'])
-      });
+    if (isIterable(store.annualYields)) {
+      const yieldErrors = [];
+      for (let y of store.annualYields) {
+        const yy = {
+          year: y?.year,
+          rotation: y?.rotation,
+          yield: parseFloat(y['yield'])
+        }
+        if (!yy.yield && yy.yield !== 0) {
+          yieldErrors.push(`Missing: yield in year #${yy.year}`);
+        }
+        store.socrates.yields['annual_yields'].push(yy);
+      }
+      if (yieldErrors.length > 0) {
+        yieldErrors.push('Missing: some yield values');
+      }
+    } else {
+      store.socrates.yields['annual_yields'] = [];
     }
   } catch (e) {
-    store.errors = e.message;
+    store.errors.push(`${e.name} ${e.message}`);
+    console.error(e);
   }
 }
 
@@ -153,7 +211,8 @@ function validateParameters() {
 
 function dataToSocrates() {
   try {
-    store.soilProperties = soils[store.socrates.soil.soil_properties]
+    store.version = store.socrates.version || Defaults.version;
+    store.soilProperties = store.socrates.soil.soil_properties;
     store.clay = store.socrates.soil.clay_percentage;
     store.cec = store.socrates.soil.cec;
     store.initialOC = store.socrates.soil.initial_oc;
@@ -170,7 +229,36 @@ function dataToSocrates() {
     store.yieldsMethodDataEntry = store.socrates.yields.yields_method_data_entry;
     store.annualYields = store.socrates.yields.annual_yields;
   } catch (e) {
-    store.errors = e.message;
+    store.errors.push(e.message);
+    console.error(e);
+  }
+}
+
+function oldDataToSocrates() {
+  try {
+    store.version = Defaults.version;
+    store.soilProperties = store.socratesOld.soil.soilProperties;
+    store.clay = store.socratesOld.soil.clayPercentage;
+    store.cec = store.socratesOld.soil.cec || 0; //Where is this in socratesOld ?
+    store.initialOC = store.socratesOld.soil.initialOC;
+    store.startYear = store.socratesOld.simulation.startYear;
+    store.periodLength = store.socratesOld.simulation.periodLength;
+    store.rotationLength = store.socratesOld.simulation.rotationLength;
+    store.climateMethodDataEntry = store.socratesOld.climate.climateMethodDataEntry;
+    store.averageAnnualRainFall = store.socratesOld.climate.averageAnnualRainfall;
+    store.annualMeanTemperature = store.socratesOld.climate.annualMeanTemperature;
+    store.randomizeRainAndTemperature = store.socratesOld.climate.randomizeRainAndTemperature;
+    store.annualRainfall = store.socratesOld.climate.annualRainFall;
+    store.monthRainTemp = store.socratesOld.climate.monthRainTemp;
+    store.rotationTable = store.socratesOld.rotation;
+    store.yieldsMethodDataEntry = store.socratesOld.yields.yieldsMethodDataEntry;
+    store.annualYields = store.socratesOld.yields.annualYields;
+    if (store.socratesOld.parametersEdited) {
+      store.parameters = store.socratesOld.parameters;
+    }
+  } catch (e) {
+    store.errors.push(e.message);
+    console.error(e);
   }
 }
 
@@ -250,6 +338,14 @@ function howToNotebook() {
     "results"
   ];
 }
+
+function isIterable(obj) {
+  // checks for null and undefined
+  if (obj == null) {
+    return false;
+  }
+  return typeof obj[Symbol.iterator] === 'function';
+}
 </script>
 
 <template>
@@ -259,11 +355,11 @@ function howToNotebook() {
         <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10" v-if="store.errors">
+              class="py-10" v-if="store.errors.length>0">
         <el-row :span="24" class="">
           <div class="w-full bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
             <p class="font-bold">Error:</p>
-            <p class="errorMessages">{{ store.errors }}</p>
+            <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
           </div>
         </el-row>
       </el-col>
@@ -560,11 +656,11 @@ function howToNotebook() {
           </el-drawer>
         </div>
         <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24"
-                class="py-10" v-if="store.errors">
+                class="py-10" v-if="store.errors.length>0">
           <el-row :span="24" class="flex flex-col justify-center items-center">
             <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
               <p class="font-bold">Error:</p>
-              <p class="errorMessages">{{ store.errors }}</p>
+              <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
             </div>
           </el-row>
         </el-col>
@@ -573,7 +669,7 @@ function howToNotebook() {
               class="py-10">
         <div>
           <el-button @click="sendForm()" size="large" type="primary">Run</el-button>
-          <el-button @click="store.showLoadDialog = true" data-toggle="modal" size="large" type="primary">Load Data
+          <el-button @click="store.showLoadDialog = true" size="large" type="primary">Load Data
           </el-button>
           <el-button @click="clearForm()" size="large" type="warning">Clear Form</el-button>
           <el-button @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
@@ -627,7 +723,7 @@ function howToNotebook() {
     </el-dialog>
     <el-dialog v-model="store.showLoadDialog" title="Load Data">
       <el-form>
-        <input type="file" @change="loadData($event)" accept="application/json"/>
+        <input type="file" @change="loadData($event)" @click="$event.target.value=''" accept="application/json"/>
       </el-form>
       <br/>
       <div class="is-align-center">or</div>

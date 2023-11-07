@@ -1,4 +1,5 @@
 export default class Defaults {
+  static version = '1.0.0';
   static getParameters() {
     return {
       "cnRate_1": 0.84,
