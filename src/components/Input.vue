@@ -485,7 +485,7 @@ function isIterable(obj) {
                            @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
                   {{ store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
                 </el-button>
-                <el-button v-if="store.climateMethodDataEntry===0"
+                <el-button class="my-2" v-if="store.climateMethodDataEntry===0"
                            @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
                   {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
                 </el-button>
