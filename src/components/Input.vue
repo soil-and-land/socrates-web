@@ -36,9 +36,9 @@ const plants = [
   {'id': 7, 'name': 'Grass Pasture', 'short_name': 'GP'}
 ];
 const grazes = [
-  {'id': 0, 'name': 'None'},
-  {'id': 1, 'name': 'Light'},
-  {'id': 2, 'name': 'Heavy'},
+  {'id': 'null', 'name': 'None'},
+  {'id': 0, 'name': 'Light'},
+  {'id': 1, 'name': 'Heavy'},
 ];
 const stubbles = [
   {'id': 0, 'name': 'Burnt or Removed'},
@@ -177,12 +177,8 @@ function socratesToData() {
         if ((!r.fertiliser && r.fertiliser !== 0)) {
           store.errors.push(`Fertiliser missing in rotation year #${r.year}`);
         }
-        if (r.plant !== 6) { // Don't test graze if plant is fallow
-          if (!r.graze && r.graze !== 0) {
-            debugger
-            store.errors.push(`Graze management missing in rotation year #${r.year}`);
-          }
-        }
+        // if (r.plant !== 6) { // Don't test graze if plant is fallow
+        // }
       }
       store.socrates.rotation.push(r);
     }
@@ -607,7 +603,7 @@ function isIterable(obj) {
                 <el-select v-model="rotation['graze']"
                            :disabled="rotation['plant'] === 6">
                   <el-option v-for="graze in grazes"
-                             :key="graze.id"
+                             :key="rotation['year'] + '_graze'"
                              :label="graze.name"
                              :value="graze.id"/>
                 </el-select>
