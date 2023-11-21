@@ -272,8 +272,9 @@ function oldDataToSocrates() {
   }
 }
 
-function clearForm() {
-  store.$reset()
+async function clearForm() {
+  store.$reset();
+  await store.getParameters();
 }
 
 async function saveResults() {
