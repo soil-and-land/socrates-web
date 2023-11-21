@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import Defaults from './defaults';
+import {parameters} from "~/model.service.js";
 
 export const useStore = defineStore({
   id: 'input',
@@ -26,7 +27,7 @@ export const useStore = defineStore({
     randomizeRainAndTemperature: 0,
     rotationTable: [],
     yieldsMethodDataEntry: 0,
-    parameters: Defaults.getParameters(),
+    parameters: [],
     showParameters: false,
     results: null,
     socrates: {
@@ -49,6 +50,9 @@ export const useStore = defineStore({
   }),
   actions: {
     // Define your actions here
+    async getParameters(){
+      this.parameters = await parameters();
+    },
     deleteRotation(index) {
       this.rotationTable.splice(index, 1);
       this.rotationLength--;
@@ -98,8 +102,8 @@ export const useStore = defineStore({
     updateMonthRainTemps({monthRainTemp}) {
       this.monthRainTemp = monthRainTemp;
     },
-    resetParameters() {
-      this.parameters = Defaults.getParameters();
+    async resetParameters() {
+      await this.getParameters();
     }
   },
 });

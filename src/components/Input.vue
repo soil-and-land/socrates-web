@@ -1,5 +1,5 @@
 <script setup lang="js">
-import {reactive, ref, toRaw} from 'vue';
+import {reactive, ref, toRaw, onMounted} from 'vue';
 import {storeToRefs} from 'pinia';
 
 import Defaults from '../defaults.js';
@@ -10,6 +10,10 @@ import {useStore} from '../store';
 import {isEmpty} from "lodash";
 
 const store = useStore();
+
+onMounted(async () => {
+  await store.getParameters();
+});
 
 const soils = [
   {id: 0, type: 'clay', name: 'clay'},
@@ -165,11 +169,19 @@ function socratesToData() {
       if ((!r.plant && r.plant !== 0) || r.plant < 0 || r.plant > 7) {
         store.errors.push(`Missing or incorrect plant in rotation year #${r.year}`);
       } else {
-        if ((!r.stubble && r.stubble !== 0)) {
-          store.errors.push(`Stubble management missing in rotation year #${r.year}`);
+        if (r.plant < 5) { // Don't test stubble if plant is fallow, or pasture
+          if ((!r.stubble && r.stubble !== 0)) {
+            store.errors.push(`Stubble management missing in rotation year #${r.year}`);
+          }
         }
         if ((!r.fertiliser && r.fertiliser !== 0)) {
           store.errors.push(`Fertiliser missing in rotation year #${r.year}`);
+        }
+        if (r.plant !== 6) { // Don't test graze if plant is fallow
+          if (!r.graze && r.graze !== 0) {
+            debugger
+            store.errors.push(`Graze management missing in rotation year #${r.year}`);
+          }
         }
       }
       store.socrates.rotation.push(r);
@@ -192,7 +204,7 @@ function socratesToData() {
         }
         store.socrates.yields['annual_yields'].push(yy);
       }
-      console.log(JSON.stringify(store.annualYields));
+      // console.log(JSON.stringify(store.annualYields));
       if (yieldErrors.length > 0) {
         yieldErrors.push('Missing: some yield values');
       }
@@ -449,9 +461,13 @@ function isIterable(obj) {
           <h3>Climate</h3>
           <el-row>
             <el-col class="py-1">
-              <div class="px-1">
-                <span>Method of entering data</span>
-                <el-select v-model="store.climateMethodDataEntry" class="m-2" placeholder="Select">
+              <el-row >
+                <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
+                  <div>Method of entering data</div>
+                </el-col>
+                <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+                  <div>
+                <el-select v-model="store.climateMethodDataEntry" class="w-full" placeholder="Select">
                   <el-option
                       label="Enter yearly rainfall & mean temperature"
                       :value="0"/>
@@ -476,7 +492,9 @@ function isIterable(obj) {
                            @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
                   {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
                 </el-button>
-              </div>
+                  </div>
+                </el-col>
+              </el-row>
             </el-col>
             <el-col class="py-1">
             <span class="input-group-addon">
@@ -574,23 +592,26 @@ function isIterable(obj) {
               </el-select>
             </el-col>
             <el-col :span="5" class="p-2">
-              <el-select v-model="rotation['stubble']">
-                <el-option v-for="stubble in stubbles"
-                           :key="stubble.id"
-                           :label="stubble.name"
-                           :value="stubble.id"/>
-              </el-select>
+              <div v-if="rotation['plant'] < 5 ">
+                <el-select v-model="rotation['stubble']"
+                           :disabled="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7">
+                  <el-option v-for="stubble in stubbles"
+                             :key="stubble.id"
+                             :label="stubble.name"
+                             :value="stubble.id"/>
+                </el-select>
+              </div>
             </el-col>
             <el-col :span="5" class="p-2">
-              <el-select v-model="rotation['graze']"
-                         clearable
-                         :disabled="rotation['stubble'] === 0">
-                <el-option v-for="graze in grazes"
-                           :key="graze.id"
-                           :label="graze.name"
-                           :value="graze.id"
-                           :disabled="rotation['stubble'] === 0"/>
-              </el-select>
+              <div v-if="rotation['plant'] !== 6">
+                <el-select v-model="rotation['graze']"
+                           :disabled="rotation['plant'] === 6">
+                  <el-option v-for="graze in grazes"
+                             :key="graze.id"
+                             :label="graze.name"
+                             :value="graze.id"/>
+                </el-select>
+              </div>
             </el-col>
             <el-col :span="5" class="p-2">
               <el-input v-model="rotation['fertiliser']"/>
@@ -616,26 +637,31 @@ function isIterable(obj) {
           <h3>Yields</h3>
           <el-row>
             <el-col class="py-1">
-              <div>
-                <span class="input-group-addon">Method of entering yield</span>
-                <el-select v-model="store.yieldsMethodDataEntry"
-                           class="m-2" placeholder="Select"
-                           @change="store.selectYield">
-                  <el-option
-                      label="Enter annual yields manually"
-                      :value="0"/>
-                  <el-option
-                      label="Computer will calculate annual yields"
-                      :value="1"/>
-                </el-select>
-                <span class="input-group-addon">
-              <a href="#" id="yieldEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
-            </span>
-                <el-button v-if="store.yieldsMethodDataEntry===0"
-                           @click="store.toggleAnnualYields = !store.toggleAnnualYields">
-                  {{ store.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
-                </el-button>
-              </div>
+              <el-row >
+                <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
+                  <div>
+                    Method of entering yield
+                  </div>
+                </el-col>
+                <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+                  <div>
+                    <el-select v-model="store.yieldsMethodDataEntry"
+                               class="w-full" placeholder="Select"
+                               @change="store.selectYield">
+                      <el-option
+                          label="Enter annual yields manually"
+                          :value="0"/>
+                      <el-option
+                          label="The model will calculate annual yields"
+                          :value="1"/>
+                    </el-select>
+                    <el-button class="my-2" v-if="store.yieldsMethodDataEntry===0"
+                               @click="store.toggleAnnualYields = !store.toggleAnnualYields">
+                      {{ store.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
+                    </el-button>
+                  </div>
+                </el-col>
+              </el-row>
             </el-col>
           </el-row>
           <el-drawer title="Annual Yields" v-model="store.toggleAnnualYields" direction="rtl" :with-header="false"

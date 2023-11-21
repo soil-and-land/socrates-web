@@ -2,7 +2,7 @@
   "soil": {
     "soil_properties": 7,
     "cec": 80,
-    "initial_oc": 1.2
+    "initial_oc": 1.15
   },
   "simulation": {
     "start_year": 1963,
@@ -45,7 +45,7 @@
       "year": 2,
       "plant": 0,
       "stubble": 0,
-      "graze": null,
+      "graze": 0,
       "fertiliser": 200
     },
     {
@@ -57,108 +57,8 @@
     }
   ],
   "yields": {
-    "yields_method_data_entry": 0,
+    "yields_method_data_entry": 1,
     "annual_yields": [
-      {
-        "year": 1963,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1964,
-        "rotation": "Wheat",
-        "yield": 3311
-      },
-      {
-        "year": 1965,
-        "rotation": "Legume Pasture",
-        "yield": 3638
-      },
-      {
-        "year": 1966,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1967,
-        "rotation": "Wheat",
-        "yield": 1195
-      },
-      {
-        "year": 1968,
-        "rotation": "Legume Pasture",
-        "yield": 7357
-      },
-      {
-        "year": 1969,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1970,
-        "rotation": "Wheat",
-        "yield": 2724
-      },
-      {
-        "year": 1971,
-        "rotation": "Legume Pasture",
-        "yield": 3034
-      },
-      {
-        "year": 1972,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1973,
-        "rotation": "Wheat",
-        "yield": 1682
-      },
-      {
-        "year": 1974,
-        "rotation": "Legume Pasture",
-        "yield": 5208
-      },
-      {
-        "year": 1975,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1976,
-        "rotation": "Wheat",
-        "yield": 2912
-      },
-      {
-        "year": 1977,
-        "rotation": "Legume Pasture",
-        "yield": 2034
-      },
-      {
-        "year": 1978,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1979,
-        "rotation": "Wheat",
-        "yield": 2238
-      },
-      {
-        "year": 1980,
-        "rotation": "Legume Pasture",
-        "yield": 1273
-      },
-      {
-        "year": 1981,
-        "rotation": "Fallow",
-        "yield": 0
-      },
-      {
-        "year": 1982,
-        "rotation": "Wheat",
-        "yield": 1768
-      }
     ]
   }
 }

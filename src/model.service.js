@@ -1,6 +1,11 @@
 export async function run({socrates, parameters}) {
-  //let response = await fetch("/run", { // For debugging local
-  let response = await fetch("https://api.socrates-soil.net/run", {
+  let url;
+  if (import.meta.env) {
+    url = "/run"; // For debugging local when running vite in dev mode
+  } else {
+    url = "https://api.socrates-soil.net/run";
+  }
+  let response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -10,6 +15,17 @@ export async function run({socrates, parameters}) {
       parameters
     }),
   });
+  let status = response.status;
+  response = await response.json();
+  if (status === 200) {
+    return response;
+  } else {
+    throw new Error(response?.message);
+  }
+}
+
+export async function parameters() {
+  let response = await fetch('parameters.json');
   let status = response.status;
   response = await response.json();
   if (status === 200) {
