@@ -1,10 +1,7 @@
 export async function run({socrates, parameters}) {
-  let url;
-  if (import.meta.env) {
-    url = "/run"; // For debugging local when running vite in dev mode
-  } else {
-    url = "https://api.socrates-soil.net/run";
-  }
+  // const url = "/run"; // For debugging local when running vite in dev mode
+  const url = "https://api.socrates-soil.net/run";
+
   let response = await fetch(url, {
     method: "POST",
     headers: {
