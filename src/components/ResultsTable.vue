@@ -57,28 +57,28 @@ const data = computed(() => {
         <template #header>OC<br/>(0-10 cm)<br/>%</template>
       </el-table-column>
       <el-table-column prop="co2" min-width="130px">
-        <template #header>Soil C <br/>(0-30 cm)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>Soil C <br/>(0-30 cm)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="n2o_fert" min-width="130px">
-        <template #header>N<sub>2</sub>O<br/>(Fertiliser)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>N<sub>2</sub>O<br/>(Fertiliser)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="n2o_min" min-width="130px">
-        <template #header>N<sub>2</sub>O<br/>(Mineralised)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>N<sub>2</sub>O<br/>(Mineralised)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="n2o_res" min-width="130px">
-        <template #header>N<sub>2</sub>O<br/>(Residues)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>N<sub>2</sub>O<br/>(Residues)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="n2o_indirect" min-width="130px">
-        <template #header>N<sub>2</sub>O<br/>(Indirect)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>N<sub>2</sub>O<br/>(Indirect)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="n2o_urine" min-width="130px">
-        <template #header>N<sub>2</sub>O<br/>(Urine)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>N<sub>2</sub>O<br/>(Urine)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="ch4_animal" min-width="130px">
-        <template #header>CH<sub>4</sub><br/>(Animal)<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>CH<sub>4</sub><br/>(Animal)<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
       <el-table-column prop="total" min-width="130px">
-        <template #header>TOTAL<br/>kg CO<sub>2</sub>-eq/Ha</template>
+        <template #header>TOTAL<br/>kg CO<sub>2</sub>-eq/ha</template>
       </el-table-column>
     </el-table>
     <div class="table-error"></div>
