@@ -45,7 +45,7 @@
       "year": 2,
       "plant": 0,
       "stubble": 0,
-      "graze": 0,
+      "graze": null,
       "fertiliser": 200
     },
     {

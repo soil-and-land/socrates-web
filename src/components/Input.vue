@@ -41,6 +41,7 @@ const grazes = [
   {'id': 1, 'name': 'Heavy'},
 ];
 const stubbles = [
+  {'id': 'null', 'name': 'None'},
   {'id': 0, 'name': 'Burnt or Removed'},
   {'id': 1, 'name': 'Retained'}
 ];
@@ -458,37 +459,39 @@ function isIterable(obj) {
           <h3>Climate</h3>
           <el-row>
             <el-col class="py-1">
-              <el-row >
+              <el-row>
                 <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
                   <div>Method of entering data</div>
                 </el-col>
                 <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
                   <div>
-                <el-select v-model="store.climateMethodDataEntry" class="w-full" placeholder="Select">
-                  <el-option
-                      label="Enter yearly rainfall & mean temperature"
-                      :value="0"/>
-                  <el-option
-                      label="Enter average rainfall & mean temperature"
-                      :value="1"/>
-                  <!--              <el-option-->
-                  <!--                  label="Closest town, stored weather averages"-->
-                  <!--                  :value="2"/>-->
-                  <!--              <el-option-->
-                  <!--                  label="Closest town, actual weather data"-->
-                  <!--                  :value="3"/>-->
-                  <el-option
-                      label="Enter monthly rainfall & mean temperature"
-                      :value="4"/>
-                </el-select>
-                <el-button v-if="store.climateMethodDataEntry===4"
-                           @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
-                  {{ store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature' }}
-                </el-button>
-                <el-button class="my-2" v-if="store.climateMethodDataEntry===0"
-                           @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
-                  {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
-                </el-button>
+                    <el-select v-model="store.climateMethodDataEntry" class="w-full" placeholder="Select">
+                      <el-option
+                          label="Enter yearly rainfall & mean temperature"
+                          :value="0"/>
+                      <el-option
+                          label="Enter average rainfall & mean temperature"
+                          :value="1"/>
+                      <!--              <el-option-->
+                      <!--                  label="Closest town, stored weather averages"-->
+                      <!--                  :value="2"/>-->
+                      <!--              <el-option-->
+                      <!--                  label="Closest town, actual weather data"-->
+                      <!--                  :value="3"/>-->
+                      <el-option
+                          label="Enter monthly rainfall & mean temperature"
+                          :value="4"/>
+                    </el-select>
+                    <el-button v-if="store.climateMethodDataEntry===4"
+                               @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
+                      {{
+                        store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature'
+                      }}
+                    </el-button>
+                    <el-button class="my-2" v-if="store.climateMethodDataEntry===0"
+                               @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
+                      {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
+                    </el-button>
                   </div>
                 </el-col>
               </el-row>
@@ -589,26 +592,14 @@ function isIterable(obj) {
               </el-select>
             </el-col>
             <el-col :span="5" class="p-2">
-              <div v-if="rotation['plant'] < 5 ">
-                <el-select v-model="rotation['stubble']"
-                           :disabled="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7">
-                  <el-option v-for="stubble in stubbles"
-                             :key="stubble.id"
-                             :label="stubble.name"
-                             :value="stubble.id"/>
-                </el-select>
-              </div>
+              <rotation-select :modelValue="rotation['stubble']" :year="rotation['year']" :name="'stubble'"
+                               :posibleValues="stubbles" @update:modelValue="(v)=>{rotation['stubble'] = v}"
+                               :nullify="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7"/>
             </el-col>
             <el-col :span="5" class="p-2">
-              <div v-if="rotation['plant'] !== 6">
-                <el-select v-model="rotation['graze']"
-                           :disabled="rotation['plant'] === 6">
-                  <el-option v-for="graze in grazes"
-                             :key="rotation['year'] + '_graze'"
-                             :label="graze.name"
-                             :value="graze.id"/>
-                </el-select>
-              </div>
+                <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
+                                 :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
+                                 :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0 || rotation['stubble'] === 1"/>
             </el-col>
             <el-col :span="5" class="p-2">
               <el-input v-model="rotation['fertiliser']"/>
@@ -634,7 +625,7 @@ function isIterable(obj) {
           <h3>Yields</h3>
           <el-row>
             <el-col class="py-1">
-              <el-row >
+              <el-row>
                 <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
                   <div>
                     Method of entering yield
