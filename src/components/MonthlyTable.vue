@@ -56,12 +56,12 @@ function updateValues($event, index, key) {
       <el-col :span="24" class="p-2 text-center text-2xl">Monthly Rain Temperature</el-col>
     </el-row>
     <el-row>
-      <el-col :span="6" class="p-2 font-bold">Month</el-col>
+      <el-col :span="5" class="p-2 font-bold">Month</el-col>
       <el-col :span="9" class="p-2 font-bold">Rainfall (mm)</el-col>
       <el-col :span="9" class="p-2 font-bold">Temperature (&#x2103;)</el-col>
     </el-row>
     <el-row v-for="(value, index) in months" :key="index" class="">
-      <el-col :span="6" class="p-2">
+      <el-col :span="5" class="p-2">
         {{ value }}
       </el-col>
       <el-col :span="9" class="p-2">

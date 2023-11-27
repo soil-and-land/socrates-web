@@ -111,6 +111,7 @@ const loadData = (event) => {
 function socratesToData() {
   try {
     store.socrates.version = store.version;
+    store.errors = [];
     store.socrates.soil['soil_properties'] = parseInt(store.soilProperties);
     if (
         (!store.socrates.soil['soil_properties'] && store.socrates.soil['soil_properties'] !== 0) ||
@@ -146,7 +147,10 @@ function socratesToData() {
     store.socrates.climate['annual_rainfall'] = [];
     if (isIterable(store.annualRainfall)) {
       for (let r of store.annualRainfall) {
-        store.socrates.climate['annual_rainfall'].push({rainfall: parseFloat(r?.rainfall)});
+        store.socrates.climate['annual_rainfall'].push({
+          rainfall: parseFloat(r?.rainfall),
+          temperature: parseFloat(r?.temperature)
+        });
       }
     }
     store.socrates.climate['month_rain_temp'] = [];
