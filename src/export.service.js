@@ -2,6 +2,24 @@ import * as converter from 'json-2-csv';
 export async function toCSV({results, initialOC}) {
   const data = [];
   data.push({
+    year: '',
+    crop: '',
+    rain: 'mm',
+    yields: 'kg DM/ha',
+    biomass: 'kg C/ha',
+    nitrogen:  'kg N/ha',
+    urine:  'kg N/ha',
+    oc: '%',
+    co2: 'kg CO2e/ha',
+    n2o_fert: 'kg CO2e/ha',
+    n2o_min: 'kg CO2e/ha',
+    n2o_res: 'kg CO2e/ha',
+    n2o_indirect: 'kg CO2e/ha',
+    n2o_urine: 'kg CO2e/ha',
+    ch4_animal: 'kg CO2e/ha',
+    total: 'kg CO2e/ha',
+  });
+  data.push({
     year: results.years[0] - 1,
     crop: '',
     rain: '',

@@ -38,38 +38,48 @@ const data = computed(() => {
     <el-table :data="data" border style="width: 100%">
       <el-table-column prop="year" label="Year"/>
       <el-table-column prop="crop" label="Crop"/>
-      <el-table-column prop="rain" label="Rain"/>
-      <el-table-column prop="yields" label="Yield"/>
+      <el-table-column prop="rain">
+        <template #header>Rain <br/>mm</template>
+      </el-table-column>
+      <el-table-column prop="yields" min-width="90px">
+        <template #header>Yield <br/>kg DM/ha</template>
+      </el-table-column>
       <el-table-column prop="biomass" min-width="90px">
-        <template #header>Biomass</template>
+        <template #header>Biomass <br/>kg C/ha</template>
       </el-table-column>
-      <el-table-column prop="nitrogen" label="Fert"/>
-      <el-table-column prop="urine" label="Urine"/>
+      <el-table-column prop="nitrogen" min-width="90px">
+        <template #header>Fert <br/>kg N/ha</template>
+      </el-table-column>
+      <el-table-column prop="urine" min-width="90px">
+        <template #header>Urine <br/>kg N/ha</template>
+      </el-table-column>
       <el-table-column prop="oc" min-width="100px">
-        <template #header>OC<br/>(0-10 cm)</template>
+        <template #header>OC<br/>(0-10 cm)<br/>%</template>
       </el-table-column>
-      <el-table-column prop="co2" min-width="100px">
-        <template #header>Soil C <br/>(0-30 cm)</template>
+      <el-table-column prop="co2" min-width="130px">
+        <template #header>Soil C <br/>(0-30 cm)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="n2o_fert" min-width="100px">
-        <template #header>N<sub>2</sub>O<br/>(Fertiliser)</template>
+      <el-table-column prop="n2o_fert" min-width="130px">
+        <template #header>N<sub>2</sub>O<br/>(Fertiliser)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="n2o_min" min-width="120px">
-        <template #header>N<sub>2</sub>O<br/>(Mineralised)</template>
+      <el-table-column prop="n2o_min" min-width="130px">
+        <template #header>N<sub>2</sub>O<br/>(Mineralised)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="n2o_res" min-width="110px">
-        <template #header>N<sub>2</sub>O<br/>(Residues)</template>
+      <el-table-column prop="n2o_res" min-width="130px">
+        <template #header>N<sub>2</sub>O<br/>(Residues)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="n2o_indirect" min-width="100px">
-        <template #header>N<sub>2</sub>O<br/>(Indirect)</template>
+      <el-table-column prop="n2o_indirect" min-width="130px">
+        <template #header>N<sub>2</sub>O<br/>(Indirect)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="n2o_urine" min-width="90px">
-        <template #header>N<sub>2</sub>O<br/>(Urine)</template>
+      <el-table-column prop="n2o_urine" min-width="130px">
+        <template #header>N<sub>2</sub>O<br/>(Urine)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="ch4_animal" min-width="90px">
-        <template #header>CH<sub>4</sub><br/>(Animal)</template>
+      <el-table-column prop="ch4_animal" min-width="130px">
+        <template #header>CH<sub>4</sub><br/>(Animal)<br/>kg CO<sub>2</sub>-eq/Ha</template>
       </el-table-column>
-      <el-table-column prop="total" label="TOTAL"/>
+      <el-table-column prop="total" min-width="130px">
+        <template #header>TOTAL<br/>kg CO<sub>2</sub>-eq/Ha</template>
+      </el-table-column>
     </el-table>
     <div class="table-error"></div>
   </el-row>
