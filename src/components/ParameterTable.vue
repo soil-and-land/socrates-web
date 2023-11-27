@@ -1,25 +1,20 @@
 <script setup lang="js">
 import {onMounted, onUpdated, reactive} from 'vue';
+import {useStore} from "~/store.js";
+const store = useStore();
 
-const props = defineProps(['parameters']);
-const state = reactive({
-  parameters: []
-});
-onUpdated(() => {
-  state.parameters = props.parameters;
-});
-onMounted(() => {
-  state.parameters = props.parameters;
-});
+function updatedParameters() {
+  store.parametersEdited = true;
+}
 
 </script>
 <template>
-    <el-row class="">
-      <el-col :span="24" class="p-2 text-center text-2xl">Parameter</el-col>
+    <el-row >
+      <el-col :span="24" class="p-2 text-center text-2xl">Parameters</el-col>
     </el-row>
-    <el-row v-for="(value, index) in state.parameters" :key="index" class="">
+    <el-row v-for="(value, index) in store.parameters" :key="index" class="">
       <el-col :span="24" class="p-2">
-        <el-input v-model="state.parameters[index]" type="number">
+        <el-input v-model="store.parameters[index]" type="number" @input="updatedParameters()">
           <template #prepend>{{ index }}</template>
         </el-input>
       </el-col>

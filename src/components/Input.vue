@@ -265,6 +265,7 @@ function oldDataToSocrates() {
     store.yieldsMethodDataEntry = store.socratesOld.yields.yieldsMethodDataEntry;
     store.annualYields = store.socratesOld.yields.annualYields;
     if (store.socratesOld.parametersEdited) {
+      store.parametersEdited = true;
       store.parameters = store.socratesOld.parameters;
     }
   } catch (e) {
@@ -276,6 +277,10 @@ function oldDataToSocrates() {
 async function clearForm() {
   store.$reset();
   await store.getParameters();
+}
+
+function clearResults() {
+  store.results = null;
 }
 
 async function saveResults() {
@@ -377,17 +382,16 @@ function isIterable(obj) {
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
         <el-button @click="store.showParameters = !store.showParameters">
-          {{ store.showParameters ? 'Hide Parameters' : 'Show Parameters' }}
+          {{ store.showParameters ? 'Hide Parameters' : 'Edit Parameters' }}
         </el-button>
         <el-drawer v-model="store.showParameters" title="Climate" :with-header="false"
                    direction="ltr" class="min-w-fit">
-          <h3>Parameters Table</h3>
-          <p>
-            <el-button @click="store.resetParameters()">Reset Parameters</el-button>
-          </p>
-          <parameter-table :parameters="store.parameters"/>
+          <parameter-table/>
+          <div class="flex flex-col justify-center items-center">
+          </div>
           <template #footer>
             <div style="flex: auto">
+              <el-button @click="store.resetParameters()">Reset Parameters</el-button>
               <el-button type="primary" @click="store.showParameters=false">Close</el-button>
             </div>
           </template>
@@ -597,9 +601,9 @@ function isIterable(obj) {
                                :nullify="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7"/>
             </el-col>
             <el-col :span="5" class="p-2">
-                <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
-                                 :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
-                                 :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0"/>
+              <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
+                               :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
+                               :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0"/>
             </el-col>
             <el-col :span="5" class="p-2">
               <el-input v-model="rotation['fertiliser']"/>
@@ -680,17 +684,51 @@ function isIterable(obj) {
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
               class="py-10">
-        <div>
+        <el-row>
           <el-button @click="sendForm()" size="large" type="primary">Run</el-button>
           <el-button @click="store.showLoadDialog = true" size="large" type="primary">Load Data
           </el-button>
           <el-button @click="clearForm()" size="large" type="warning">Clear Form</el-button>
+          <el-button @click="clearResults()" size="large" type="warning">Clear Results</el-button>
           <el-button @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
-        </div>
+        </el-row>
       </el-col>
+    </el-row>
+    <el-row id="resultsOfInputPage"></el-row>
+    <el-row :gutter="20" class="flex flex-col justify-center items-center"
+            v-if="store.parametersEdited">
+      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+        <el-row>
+          <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md" role="alert">
+            <div class="flex">
+              <div class="py-1">
+                <svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 20 20">
+                  <path
+                      d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-bold">Note: You have modified the input parameters </p>
+                <p class="text-sm">Results will be affected and the model might return an error.
+                  To restore or modify them <a class="cursor-pointer font-bold underline"
+                                               @click="store.showParameters = true">click here</a>
+                  and re run the model.</p>
+              </div>
+            </div>
+          </div>
+        </el-row>
+      </el-col>
+    </el-row>
+    <el-row :gutter="20" class="flex flex-col justify-center items-center">
       <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="store.results" id="resultsOfInputPage">
-        <el-row :span="24" class="max-h-[600px]">
+              v-if="store.results">
+        <el-row>
+          <div class="grid">
+            <h3 class="justify-self-center text-3xl">Results</h3>
+          </div>
+        </el-row>
+        <el-row :span="24" class="max-h-[600px] overflow-auto">
           <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
                       :data="store.results.organic_carbon.data_points"/>
         </el-row>

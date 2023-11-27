@@ -46,12 +46,14 @@ export const useStore = defineStore({
     showLoadDialog: false,
     selectedFile: null,
     socratesOld: {}, //To suport old versions of the json input file
-    errors: []
+    errors: [],
+    parametersEdited: false
   }),
   actions: {
     // Define your actions here
     async getParameters(){
       this.parameters = await parameters();
+      this.parametersEdited = false;
     },
     deleteRotation(index) {
       this.rotationTable.splice(index, 1);
