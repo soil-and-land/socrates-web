@@ -599,7 +599,7 @@ function isIterable(obj) {
             <el-col :span="5" class="p-2">
                 <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
                                  :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
-                                 :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0 || rotation['stubble'] === 1"/>
+                                 :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0"/>
             </el-col>
             <el-col :span="5" class="p-2">
               <el-input v-model="rotation['fertiliser']"/>
