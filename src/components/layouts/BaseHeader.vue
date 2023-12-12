@@ -3,7 +3,7 @@ import { toggleDark } from "~/composables";
 </script>
 
 <template>
-  <el-menu class="el-menu-demo" mode="horizontal" :router="true">
+  <el-menu class="sticky top-0 z-50" mode="horizontal" :router="true">
     <el-menu-item index="/input">SOCRATES</el-menu-item>
     <el-menu-item index="/about">About</el-menu-item>
     <el-menu-item index="/help">Help</el-menu-item>

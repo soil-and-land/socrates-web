@@ -31,7 +31,7 @@ const plants = [
   {'id': 2, 'name': 'Oats', 'short_name': 'Oa'},
   {'id': 3, 'name': 'Canola', 'short_name': 'Ca'},
   {'id': 4, 'name': 'Grain Legume', 'short_name': 'GL'},
-  {'id': 5, 'name': 'Legume Pasture', 'short_name': 'LP'},
+  {'id': 5, 'name': 'Improved Pasture', 'short_name': 'IP'},
   {'id': 6, 'name': 'Fallow', 'short_name': 'Fa'},
   {'id': 7, 'name': 'Grass Pasture', 'short_name': 'GP'}
 ];
@@ -324,7 +324,11 @@ function saveInputs() {
 function scrollToTop(id) {
   setTimeout(function () {
     // window.scroll({top: 0, left:0, behavior: 'smooth'});
-    document.getElementById(id).scrollIntoView({behavior: 'smooth'});
+    // document.getElementById(id).scrollIntoView({behavior: 'smooth'});
+    const yOffset = -40;
+    const element = document.getElementById(id);
+    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({top: y, behavior: 'smooth'});
   }, 100);
 }
 
@@ -366,397 +370,416 @@ function isIterable(obj) {
 </script>
 
 <template>
-  <div class="mx-4" id="topOfInputPage">
-    <el-row :gutter="20" class="flex flex-col justify-center items-center">
-      <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
-        <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10" v-if="store.errors.length>0">
-        <el-row :span="24" class="">
-          <div class="w-full bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
-            <p class="font-bold">Error:</p>
-            <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
+  <div class="mx-4 min-w-[650px]" id="topOfInputPage">
+    <el-row :gutter="30">
+      <el-col :xl="5" :lg="5" :md="5" :sm="5" :xs="5">
+        <el-row class="pt-2 sticky top-20 justify-center">
+          <div class="px-4 py-3 w-100 sm-100 md-100 lg-200 xl-200">
+            <div class="pb-3 sm:pb-4">
+              <el-button class="w-full" @click="sendForm()" size="large" type="primary">Run</el-button>
+            </div>
+            <div class="pb-3 sm:pb-4">
+              <el-button class="w-full" @click="store.showLoadDialog = true" size="large" type="primary">Load Data
+              </el-button>
+            </div>
+            <div class="pb-3 sm:pb-4">
+              <el-button class="w-full" @click="clearForm()" size="large" type="warning">Clear Form</el-button>
+            </div>
+            <div class="pb-3 sm:pb-4">
+              <el-button class="w-full" @click="clearResults()" size="large" type="warning">Clear Results</el-button>
+            </div>
+            <div class="pb-3 sm:pb-4">
+              <el-button class="w-full" @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
+            </div>
           </div>
         </el-row>
       </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
-        <el-button @click="store.showParameters = !store.showParameters">
-          {{ store.showParameters ? 'Hide Parameters' : 'Edit Parameters' }}
-        </el-button>
-        <el-drawer v-model="store.showParameters" title="Climate" :with-header="false"
-                   direction="ltr" class="min-w-fit">
-          <parameter-table/>
-          <div class="flex flex-col justify-center items-center">
-          </div>
-          <template #footer>
-            <div style="flex: auto">
-              <el-button @click="store.resetParameters()">Reset Parameters</el-button>
-              <el-button type="primary" @click="store.showParameters=false">Close</el-button>
-            </div>
-          </template>
-        </el-drawer>
-        <h3>Soil</h3>
-        <el-row>
-          <el-col class="py-1">
-            <div class="px-1">
-              <span>Soil Properties</span>
-              <el-select v-model="store.soilProperties" class="m-2" placeholder="Select">
-                <el-option v-for="soil in soils"
-                           :key="soil.id"
-                           :label="soil.type"
-                           :value="soil.id"/>
-              </el-select>
-            </div>
+      <el-col :xl="19" :lg="19" :md="19" :sm="19" :xs="19">
+        <el-row class="min-w-[500px] max-w-[1200px]">
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
           </el-col>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.clay" placeholder="Clay %"
-                        :disabled="store.soilProperties !== 6">
-                <template #prepend>Clay %</template>
-              </el-input>
-            </div>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
+                  class="py-10" v-if="store.errors.length>0">
+            <el-row class="">
+              <div class="w-full bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+                <p class="font-bold">Error:</p>
+                <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
+              </div>
+            </el-row>
           </el-col>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.cec" placeholder="CEC"
-                        :disabled="store.soilProperties !== 7">
-                <template #prepend>CEC</template>
-              </el-input>
-            </div>
-          </el-col>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.initialOC" placeholder="OC">
-                <template #prepend>Initial OC %</template>
-              </el-input>
-            </div>
-          </el-col>
-        </el-row>
-        <h3>Simulation</h3>
-        <el-row>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.startYear" placeholder="(eg. 1990)">
-                <template #prepend>Start year</template>
-              </el-input>
-            </div>
-          </el-col>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.periodLength" placeholder="Period">
-                <template #prepend>Simulation period in years</template>
-              </el-input>
-            </div>
-          </el-col>
-          <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="8" :xs="24">
-            <div class="px-1">
-              <el-input v-model="store.rotationLength"
-                        placeholder="(eg. Peas - Wheat would be 2)"
-                        @change="store.updateRotationLength">
-                <template #prepend>Length of rotation in years</template>
-              </el-input>
-            </div>
-          </el-col>
-        </el-row>
-        <div>
-          <h3>Climate</h3>
-          <el-row>
-            <el-col class="py-1">
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <el-button @click="store.showParameters = !store.showParameters">
+              {{ store.showParameters ? 'Hide Parameters' : 'Edit Parameters' }}
+            </el-button>
+            <el-drawer v-model="store.showParameters" title="Climate" :with-header="false"
+                       direction="ltr" class="min-w-fit">
+              <parameter-table/>
+              <div class="flex flex-col justify-center items-center">
+              </div>
+              <template #footer>
+                <div style="flex: auto">
+                  <el-button @click="store.resetParameters()">Reset Parameters</el-button>
+                  <el-button type="primary" @click="store.showParameters=false">Close</el-button>
+                </div>
+              </template>
+            </el-drawer>
+            <h3>Soil</h3>
+            <el-row>
+              <el-col class="py-1">
+                <div class="px-1">
+                  <span>Soil Properties</span>
+                  <el-select v-model="store.soilProperties" class="m-2" placeholder="Select">
+                    <el-option v-for="soil in soils"
+                               :key="soil.id"
+                               :label="soil.type"
+                               :value="soil.id"/>
+                  </el-select>
+                </div>
+              </el-col>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.clay" placeholder="Clay %"
+                            :disabled="store.soilProperties !== 6">
+                    <template #prepend>Clay %</template>
+                  </el-input>
+                </div>
+              </el-col>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.cec" placeholder="CEC"
+                            :disabled="store.soilProperties !== 7">
+                    <template #prepend>CEC</template>
+                  </el-input>
+                </div>
+              </el-col>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.initialOC" placeholder="OC">
+                    <template #prepend>Initial OC %</template>
+                  </el-input>
+                </div>
+              </el-col>
+            </el-row>
+            <h3>Simulation</h3>
+            <el-row>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.startYear" placeholder="(eg. 1990)">
+                    <template #prepend>Start year</template>
+                  </el-input>
+                </div>
+              </el-col>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.periodLength" placeholder="Period">
+                    <template #prepend>Simulation period in years</template>
+                  </el-input>
+                </div>
+              </el-col>
+              <el-col class="py-1" :xl="8" :lg="8" :md="8" :sm="24" :xs="24">
+                <div class="px-1">
+                  <el-input v-model="store.rotationLength"
+                            placeholder="(eg. Peas - Wheat would be 2)"
+                            @change="store.updateRotationLength">
+                    <template #prepend>Length of rotation in years</template>
+                  </el-input>
+                </div>
+              </el-col>
+            </el-row>
+            <div>
+              <h3>Climate</h3>
               <el-row>
-                <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
-                  <div>Method of entering data</div>
+                <el-col class="py-1">
+                  <el-row>
+                    <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
+                      <div>Method of entering data</div>
+                    </el-col>
+                    <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+                      <div>
+                        <el-select v-model="store.climateMethodDataEntry" class="w-full" placeholder="Select">
+                          <el-option
+                              label="Enter yearly rainfall & mean temperature"
+                              :value="0"/>
+                          <el-option
+                              label="Enter average rainfall & mean temperature"
+                              :value="1"/>
+                          <!--              <el-option-->
+                          <!--                  label="Closest town, stored weather averages"-->
+                          <!--                  :value="2"/>-->
+                          <!--              <el-option-->
+                          <!--                  label="Closest town, actual weather data"-->
+                          <!--                  :value="3"/>-->
+                          <el-option
+                              label="Enter monthly rainfall & mean temperature"
+                              :value="4"/>
+                        </el-select>
+                        <el-button v-if="store.climateMethodDataEntry===4"
+                                   @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
+                          {{
+                            store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature'
+                          }}
+                        </el-button>
+                        <el-button class="my-2" v-if="store.climateMethodDataEntry===0"
+                                   @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
+                          {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
+                        </el-button>
+                      </div>
+                    </el-col>
+                  </el-row>
                 </el-col>
-                <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
-                  <div>
-                    <el-select v-model="store.climateMethodDataEntry" class="w-full" placeholder="Select">
-                      <el-option
-                          label="Enter yearly rainfall & mean temperature"
-                          :value="0"/>
-                      <el-option
-                          label="Enter average rainfall & mean temperature"
-                          :value="1"/>
-                      <!--              <el-option-->
-                      <!--                  label="Closest town, stored weather averages"-->
-                      <!--                  :value="2"/>-->
-                      <!--              <el-option-->
-                      <!--                  label="Closest town, actual weather data"-->
-                      <!--                  :value="3"/>-->
-                      <el-option
-                          label="Enter monthly rainfall & mean temperature"
-                          :value="4"/>
-                    </el-select>
-                    <el-button v-if="store.climateMethodDataEntry===4"
-                               @click="store.toggleMonthlyClimate = !store.toggleMonthlyClimate">
-                      {{
-                        store.toggleMonthlyClimate ? 'Hide Monthly Rain/Temperature' : 'Show Monthly Rain/Temperature'
-                      }}
-                    </el-button>
-                    <el-button class="my-2" v-if="store.climateMethodDataEntry===0"
-                               @click="store.toggleYearlyClimate = !store.toggleYearlyClimate">
-                      {{ store.toggleYearlyClimate ? 'Hide Yearly Rain' : 'Show Yearly Rain' }}
-                    </el-button>
-                  </div>
-                </el-col>
-              </el-row>
-            </el-col>
-            <el-col class="py-1">
+                <el-col class="py-1">
             <span class="input-group-addon">
               <a href="#" id="climateEdit" rel="popover"><i class="glyphicon glyphicon-edit"></i></a>
             </span>
-            </el-col>
-            <el-col class="py-1" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
-              <el-drawer title="Climate" v-if="store.climateMethodDataEntry===4" v-model="store.toggleMonthlyClimate"
-                         :with-header="false" direction="rtl" class="min-w-fit">
-                <monthly-table :monthRainTemp="store.monthRainTemp"
-                               :periodLength="store.periodLength"
-                               :startYear="store.startYear"
-                               @updateMonthRainTemps="store.updateMonthRainTemps"/>
-                <template #footer>
-                  <div style="flex: auto">
-                    <el-button type="primary" @click="store.toggleMonthlyClimate=false">Close</el-button>
-                  </div>
-                </template>
-              </el-drawer>
-              <el-drawer title="Climate" v-if="store.climateMethodDataEntry===0" v-model="store.toggleYearlyClimate"
-                         direction="rtl" :with-header="false" class="min-w-fit">
-                <yearly-table :annualRainfall="store.annualRainfall"
-                              :periodLength="store.periodLength"
-                              :startYear="store.startYear"
-                              @updateAnnualRainfall="store.updateRainfall"/>
-                <template #footer>
-                  <div style="flex: auto">
-                    <el-button type="primary" @click="store.toggleYearlyClimate=false">Close</el-button>
-                  </div>
-                </template>
-              </el-drawer>
-            </el-col>
-            <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
-              <div class="px-1">
-                <el-input v-model="store.averageAnnualRainFall" placeholder="Rain"
-                          :disabled="store.climateMethodDataEntry===4 || store.climateMethodDataEntry===0">
-                  <template #prepend>Average annual rainfall (mm)</template>
-                </el-input>
-              </div>
-            </el-col>
-            <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="12" :xs="24">
-              <div class="px-1">
-                <el-input v-model="store.annualMeanTemperature" placeholder="Temperature"
-                          :disabled="store.climateMethodDataEntry===4">
-                  <template #prepend>Annual mean temperature (&#x2103;)</template>
-                </el-input>
-              </div>
-            </el-col>
-            <!--<div class="input-group">-->
-            <!--    <span class="input-group-addon">Closest town (i.e. weather station)</span>-->
-            <!--    <select id="closestTown" name="closestTown" class="form-control">-->
-            <!--        &lt;!&ndash;<option value="none" disabled selected="selected">Select...</option>&ndash;&gt;-->
-            <!--        <% weatherSource.forEach(function (weather, i) { %>-->
-            <!--        <option value = "<%= weather.id %>"><%= weather.name %></option>-->
-            <!--        <% }); %>-->
-            <!--    </select>-->
-            <!--</div>-->
-            <el-col class="py-1">
-              <div>
-                <span>Randomize rainfall and temperature</span>
-                <el-select v-model="store.randomizeRainAndTemperature" class="m-2" placeholder="Select">
-                  <el-option
-                      label="No"
-                      :value="0"/>
-                  <el-option
-                      label="Yes"
-                      :value="1"/>
-                </el-select>
-              </div>
-            </el-col>
-          </el-row>
-        </div>
-        <div>
-          <h3>Rotation</h3>
-          <el-row :span="24" v-if="store.rotationTableMessage">{{ store.rotationTableMessage }}</el-row>
-          <el-row class="border-solid border-1 border-b-0 border-gray-200">
-            <el-col :span="1" class="p-2 text-center">Year</el-col>
-            <el-col :span="5" class="p-2 text-center">Plant</el-col>
-            <el-col :span="5" class="p-2 text-center">Stubble</el-col>
-            <el-col :span="5" class="p-2 text-center">Graze</el-col>
-            <el-col :span="5" class="p-2 text-center">Fertiliser</el-col>
-            <el-col :span="3"></el-col>
-          </el-row>
-          <el-row v-for="(rotation, idx) of store.rotationTable" :key="idx"
-                  class="border-solid border-1 border-gray-200">
-            <el-col :span="2" class="p-2">
-              <el-input v-model="rotation['year']"/>
-            </el-col>
-            <el-col :span="5" class="p-2">
-              <el-select v-model="rotation['plant']">
-                <el-option v-for="plant in plants"
-                           :key="plant.id"
-                           :label="plant.name"
-                           :value="plant.id"/>
-              </el-select>
-            </el-col>
-            <el-col :span="5" class="p-2">
-              <rotation-select :modelValue="rotation['stubble']" :year="rotation['year']" :name="'stubble'"
-                               :posibleValues="stubbles" @update:modelValue="(v)=>{rotation['stubble'] = v}"
-                               :nullify="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7"/>
-            </el-col>
-            <el-col :span="5" class="p-2">
-              <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
-                               :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
-                               :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0"/>
-            </el-col>
-            <el-col :span="5" class="p-2">
-              <el-input v-model="rotation['fertiliser']"/>
-            </el-col>
-            <el-col :span="2" class="p-2">
-              <el-button
-                  v-if="idx===store.rotationLength-1"
-                  link
-                  type="primary"
-                  size="small"
-                  class="w-full"
-                  @click.prevent="store.deleteRotation(idx)">
-                Remove
-              </el-button>
-            </el-col>
-          </el-row>
-          <el-row>
-            <el-button class="mt-4 w-full" @click="store.addRotation">Add Rotation</el-button>
-          </el-row>
-          <div class="rotation-error"></div>
-        </div>
-        <div>
-          <h3>Yields</h3>
-          <el-row>
-            <el-col class="py-1">
-              <el-row>
-                <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
-                  <div>
-                    Method of entering yield
+                </el-col>
+                <el-col class="py-1" :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+                  <el-drawer title="Climate" v-if="store.climateMethodDataEntry===4"
+                             v-model="store.toggleMonthlyClimate"
+                             :with-header="false" direction="rtl" class="min-w-fit">
+                    <monthly-table :monthRainTemp="store.monthRainTemp"
+                                   :periodLength="store.periodLength"
+                                   :startYear="store.startYear"
+                                   @updateMonthRainTemps="store.updateMonthRainTemps"/>
+                    <template #footer>
+                      <div style="flex: auto">
+                        <el-button type="primary" @click="store.toggleMonthlyClimate=false">Close</el-button>
+                      </div>
+                    </template>
+                  </el-drawer>
+                  <el-drawer title="Climate" v-if="store.climateMethodDataEntry===0"
+                             v-model="store.toggleYearlyClimate"
+                             direction="rtl" :with-header="false" class="min-w-fit">
+                    <yearly-table :annualRainfall="store.annualRainfall"
+                                  :periodLength="store.periodLength"
+                                  :startYear="store.startYear"
+                                  @updateAnnualRainfall="store.updateRainfall"/>
+                    <template #footer>
+                      <div style="flex: auto">
+                        <el-button type="primary" @click="store.toggleYearlyClimate=false">Close</el-button>
+                      </div>
+                    </template>
+                  </el-drawer>
+                </el-col>
+                <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+                  <div class="px-1">
+                    <el-input v-model="store.averageAnnualRainFall" placeholder="Rain"
+                              :disabled="store.climateMethodDataEntry===4 || store.climateMethodDataEntry===0">
+                      <template #prepend>Average annual rainfall (mm)</template>
+                    </el-input>
                   </div>
                 </el-col>
-                <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+                <el-col class="py-1" :xl="12" :lg="12" :md="12" :sm="24" :xs="24">
+                  <div class="px-1">
+                    <el-input v-model="store.annualMeanTemperature" placeholder="Temperature"
+                              :disabled="store.climateMethodDataEntry===4">
+                      <template #prepend>Annual mean temperature (&#x2103;)</template>
+                    </el-input>
+                  </div>
+                </el-col>
+                <!--<div class="input-group">-->
+                <!--    <span class="input-group-addon">Closest town (i.e. weather station)</span>-->
+                <!--    <select id="closestTown" name="closestTown" class="form-control">-->
+                <!--        &lt;!&ndash;<option value="none" disabled selected="selected">Select...</option>&ndash;&gt;-->
+                <!--        <% weatherSource.forEach(function (weather, i) { %>-->
+                <!--        <option value = "<%= weather.id %>"><%= weather.name %></option>-->
+                <!--        <% }); %>-->
+                <!--    </select>-->
+                <!--</div>-->
+                <el-col class="py-1">
                   <div>
-                    <el-select v-model="store.yieldsMethodDataEntry"
-                               class="w-full" placeholder="Select"
-                               @change="store.selectYield">
+                    <span>Randomize rainfall and temperature</span>
+                    <el-select v-model="store.randomizeRainAndTemperature" class="m-2" placeholder="Select">
                       <el-option
-                          label="Enter annual yields manually"
+                          label="No"
                           :value="0"/>
                       <el-option
-                          label="The model will calculate annual yields"
+                          label="Yes"
                           :value="1"/>
                     </el-select>
-                    <el-button class="my-2" v-if="store.yieldsMethodDataEntry===0"
-                               @click="store.toggleAnnualYields = !store.toggleAnnualYields">
-                      {{ store.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
-                    </el-button>
                   </div>
                 </el-col>
               </el-row>
+            </div>
+            <div>
+              <h3>Rotation</h3>
+              <el-row :span="24" v-if="store.rotationTableMessage">{{ store.rotationTableMessage }}</el-row>
+              <el-row class="border-solid border-1 border-b-0 border-gray-200">
+                <el-col :span="1" class="p-2 text-center">Year</el-col>
+                <el-col :span="5" class="p-2 text-center">Plant</el-col>
+                <el-col :span="5" class="p-2 text-center">Stubble</el-col>
+                <el-col :span="5" class="p-2 text-center">Graze</el-col>
+                <el-col :span="5" class="p-2 text-center">Fertiliser</el-col>
+                <el-col :span="3"></el-col>
+              </el-row>
+              <el-row v-for="(rotation, idx) of store.rotationTable" :key="idx"
+                      class="border-solid border-1 border-gray-200">
+                <el-col :span="2" class="p-2">
+                  <el-input v-model="rotation['year']"/>
+                </el-col>
+                <el-col :span="5" class="p-2">
+                  <el-select v-model="rotation['plant']">
+                    <el-option v-for="plant in plants"
+                               :key="plant.id"
+                               :label="plant.name"
+                               :value="plant.id"/>
+                  </el-select>
+                </el-col>
+                <el-col :span="5" class="p-2">
+                  <rotation-select :modelValue="rotation['stubble']" :year="rotation['year']" :name="'stubble'"
+                                   :posibleValues="stubbles" @update:modelValue="(v)=>{rotation['stubble'] = v}"
+                                   :nullify="rotation['plant'] === 5 || rotation['plant'] === 6 || rotation['plant'] === 7"/>
+                </el-col>
+                <el-col :span="5" class="p-2">
+                  <rotation-select :modelValue="rotation['graze']" :year="rotation['year']" :name="'graze'"
+                                   :posibleValues="grazes" @update:modelValue="(v)=>{rotation['graze'] = v}"
+                                   :nullify="rotation['plant'] === 6 || rotation['stubble'] === 0"/>
+                </el-col>
+                <el-col :span="5" class="p-2">
+                  <el-input v-model="rotation['fertiliser']"/>
+                </el-col>
+                <el-col :span="2" class="p-2">
+                  <el-button
+                      v-if="idx===store.rotationLength-1"
+                      link
+                      type="primary"
+                      size="small"
+                      class="w-full"
+                      @click.prevent="store.deleteRotation(idx)">
+                    Remove
+                  </el-button>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-button class="mt-4 w-full" @click="store.addRotation">Add Rotation</el-button>
+              </el-row>
+              <div class="rotation-error"></div>
+            </div>
+            <div>
+              <h3>Yields</h3>
+              <el-row>
+                <el-col class="py-1">
+                  <el-row>
+                    <el-col :xl="4" :lg="4" :md="4" :sm="24" :xs="24">
+                      <div>
+                        Method of entering yield
+                      </div>
+                    </el-col>
+                    <el-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+                      <div>
+                        <el-select v-model="store.yieldsMethodDataEntry"
+                                   class="w-full" placeholder="Select"
+                                   @change="store.selectYield">
+                          <el-option
+                              label="Enter annual yields manually"
+                              :value="0"/>
+                          <el-option
+                              label="The model will calculate annual yields"
+                              :value="1"/>
+                        </el-select>
+                        <el-button class="my-2" v-if="store.yieldsMethodDataEntry===0"
+                                   @click="store.toggleAnnualYields = !store.toggleAnnualYields">
+                          {{ store.toggleAnnualYields ? 'Hide Annual Yields' : 'Show Annual Yields' }}
+                        </el-button>
+                      </div>
+                    </el-col>
+                  </el-row>
+                </el-col>
+              </el-row>
+              <el-drawer title="Annual Yields" v-model="store.toggleAnnualYields" direction="rtl" :with-header="false"
+                         class="min-w-fit">
+                <yields-table :annualYields="store.annualYields"
+                              :startYear="store.startYear"
+                              :periodLength="store.periodLength"
+                              :rotationLenght="store.rotationTable.length"
+                              :rotationTable="store.rotationTable"
+                              :plants="plants"
+                              @updateYields="store.updateYields"/>
+                <template #footer>
+                  <div style="flex: auto">
+                    <el-button type="primary" @click="store.toggleAnnualYields=false">Close</el-button>
+                  </div>
+                </template>
+              </el-drawer>
+            </div>
+            <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24"
+                    class="py-10" v-if="store.errors.length>0">
+              <el-row :span="24" class="flex flex-col justify-center items-center">
+                <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
+                  <p class="font-bold">Error:</p>
+                  <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
+                </div>
+              </el-row>
             </el-col>
-          </el-row>
-          <el-drawer title="Annual Yields" v-model="store.toggleAnnualYields" direction="rtl" :with-header="false"
-                     class="min-w-fit">
-            <yields-table :annualYields="store.annualYields"
-                          :startYear="store.startYear"
-                          :periodLength="store.periodLength"
-                          :rotationLenght="store.rotationTable.length"
-                          :rotationTable="store.rotationTable"
-                          :plants="plants"
-                          @updateYields="store.updateYields"/>
-            <template #footer>
-              <div style="flex: auto">
-                <el-button type="primary" @click="store.toggleAnnualYields=false">Close</el-button>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
+    <div id="resultsOfInputPage">
+      <el-row :gutter="20" class="flex flex-col justify-center items-center"
+              v-if="store.parametersEdited">
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
+          <el-row class="pt-4"></el-row>
+          <el-row>
+            <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md"
+                 role="alert">
+              <div class="flex">
+                <div class="py-1">
+                  <svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg"
+                       viewBox="0 0 20 20">
+                    <path
+                        d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <p class="font-bold">Note: You have modified the input parameters </p>
+                  <p class="text-sm">Results will be affected and the model might return an error.
+                    To restore or modify them <a class="cursor-pointer font-bold underline"
+                                                 @click="store.showParameters = true">click here</a>
+                    and re run the model.</p>
+                </div>
               </div>
-            </template>
-          </el-drawer>
-        </div>
-        <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24"
-                class="py-10" v-if="store.errors.length>0">
-          <el-row :span="24" class="flex flex-col justify-center items-center">
-            <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4" role="alert">
-              <p class="font-bold">Error:</p>
-              <p class="errorMessages" v-for="error of store.errors">{{ error }}</p>
             </div>
           </el-row>
         </el-col>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10">
-        <el-row>
-          <el-button @click="sendForm()" size="large" type="primary">Run</el-button>
-          <el-button @click="store.showLoadDialog = true" size="large" type="primary">Load Data
-          </el-button>
-          <el-button @click="clearForm()" size="large" type="warning">Clear Form</el-button>
-          <el-button @click="clearResults()" size="large" type="warning">Clear Results</el-button>
-          <el-button @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
-        </el-row>
-      </el-col>
-    </el-row>
-    <el-row id="resultsOfInputPage"></el-row>
-    <el-row :gutter="20" class="flex flex-col justify-center items-center"
-            v-if="store.parametersEdited">
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
-        <el-row>
-          <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md" role="alert">
-            <div class="flex">
-              <div class="py-1">
-                <svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg"
-                     viewBox="0 0 20 20">
-                  <path
-                      d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
-                </svg>
-              </div>
-              <div>
-                <p class="font-bold">Note: You have modified the input parameters </p>
-                <p class="text-sm">Results will be affected and the model might return an error.
-                  To restore or modify them <a class="cursor-pointer font-bold underline"
-                                               @click="store.showParameters = true">click here</a>
-                  and re run the model.</p>
-              </div>
+      </el-row>
+      <el-row :gutter="20" class="flex flex-col justify-center items-center">
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+                v-if="store.results">
+          <el-row>
+            <div class="grid">
+              <h3 class="justify-self-center text-3xl">Results</h3>
             </div>
+          </el-row>
+          <el-row :span="24" class="max-h-[600px] overflow-auto">
+            <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
+                        :data="store.results.organic_carbon.data_points"/>
+          </el-row>
+        </el-col>
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+                v-if="store.results">
+          <management-table :results="store.results"/>
+        </el-col>
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+                v-if="store.results">
+          <results-table :results="store.results" :initial-o-c="store.initialOC"/>
+        </el-col>
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+                v-if="store.results">
+          <pie-chart :label="'Total greenhouse gas emissions'"
+                     :data="store.results"/>
+        </el-col>
+        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
+                class="py-10" v-if="store.results">
+          <div>
+            <el-button @click="saveResults()" data-toggle="modal" size="large" type="primary">Save Results</el-button>
+            <el-button v-if="store.results" @click="howToNotebook()" size="large" type="primary">Run in notebook
+            </el-button>
+            <el-button @click="scrollToTop('topOfInputPage')" size="large" type="info">Scroll to Top</el-button>
           </div>
-        </el-row>
-      </el-col>
-    </el-row>
-    <el-row :gutter="20" class="flex flex-col justify-center items-center">
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="store.results">
-        <el-row>
-          <div class="grid">
-            <h3 class="justify-self-center text-3xl">Results</h3>
-          </div>
-        </el-row>
-        <el-row :span="24" class="max-h-[600px] overflow-auto">
-          <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
-                      :data="store.results.organic_carbon.data_points"/>
-        </el-row>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="store.results">
-        <management-table :results="store.results"/>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="store.results">
-        <results-table :results="store.results" :initial-o-c="store.initialOC"/>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              v-if="store.results">
-        <pie-chart :label="'Total greenhouse gas emissions'"
-                   :data="store.results"/>
-      </el-col>
-      <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-              class="py-10" v-if="store.results">
-        <div>
-          <el-button @click="saveResults()" data-toggle="modal" size="large" type="primary">Save Results</el-button>
-          <el-button v-if="store.results" @click="howToNotebook()" size="large" type="primary">Run in notebook
-          </el-button>
-          <el-button @click="scrollToTop('topOfInputPage')" size="large" type="info">Scroll to Top</el-button>
-        </div>
-      </el-col>
-    </el-row>
-    <el-row class="pb-20"></el-row>
+        </el-col>
+      </el-row>
+    </div>
     <el-dialog v-model="store.displayRunInNotebook"
                title="## Copy and Paste the following code in a jupyter notebook ##">
       <div class="overflow-x-scroll">
