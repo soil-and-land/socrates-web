@@ -6,7 +6,7 @@
   <div class="mx-4">
     <el-row :gutter="20" class="flex flex-col justify-center items-center">
       <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
-      <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S. Help</h2>
+        <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S. Help</h2>
       </el-col>
       <el-col :span="24" :xl="20" :lg="20" :md="24" :sm="24" :xs="24">
         <div class="col-md-1"></div>
@@ -111,10 +111,10 @@
                 (including roots) will be estimated from these figures.
               </p>
               <h4>Model will calculate annual yields</h4>
-              <p>When yields are not available, SOCRATES can estimate them using a modified form of the French-Schultz
-                growing season rainfall (+ stored water) vs yield model (these can be modified by the user if site
-                specific data is available, see next paragraph). We assume that during as average season crops and
-                pastures will have available (before evaporation) approximately 70% of the growing season rainfall.</p>
+              <p>When yields are not available, SOCRATES estimates them based on annual rainfall and derivations of
+                growing season rainfall and stored water combined with water use efficiency. We assume that during as
+                average season crops and pastures will have available (before evaporation) approximately 70% of the
+                growing season rainfall.</p>
             </div>
           </div>
           <div class="basic-form">

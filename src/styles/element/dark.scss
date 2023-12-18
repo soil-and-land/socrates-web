@@ -12,3 +12,5 @@ $--colors: (
 @forward "element-plus/theme-chalk/src/dark/var.scss" with (
   $colors: $--colors
 );
+
+$--ep-fill-color-blank: black;

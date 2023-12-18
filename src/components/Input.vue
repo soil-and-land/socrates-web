@@ -325,7 +325,7 @@ function scrollToTop(id) {
   setTimeout(function () {
     // window.scroll({top: 0, left:0, behavior: 'smooth'});
     // document.getElementById(id).scrollIntoView({behavior: 'smooth'});
-    const yOffset = -40;
+    const yOffset = -50;
     const element = document.getElementById(id);
     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
     window.scrollTo({top: y, behavior: 'smooth'});
@@ -372,7 +372,7 @@ function isIterable(obj) {
 <template>
   <div class="mx-4 min-w-[650px]" id="topOfInputPage">
     <el-row :gutter="30">
-      <el-col :xl="5" :lg="5" :md="5" :sm="5" :xs="5">
+      <el-col :xl="4" :lg="4" :md="4" :sm="4" :xs="4">
         <el-row class="pt-2 sticky top-20 justify-center">
           <div class="px-4 py-3 w-100 sm-100 md-100 lg-200 xl-200">
             <div class="pb-3 sm:pb-4">
@@ -391,11 +391,20 @@ function isIterable(obj) {
             <div class="pb-3 sm:pb-4">
               <el-button class="w-full" @click="saveInputs()" size="large" type="info">Save Inputs</el-button>
             </div>
+            <div class="pb-3 sm:pb-4" v-if="store.results">
+              <el-button class="w-full" @click="saveResults()" data-toggle="modal" size="large" type="primary">Save
+                Results
+              </el-button>
+            </div>
+            <div class="pb-3 sm:pb-4" v-if="store.results">
+              <el-button class="w-full" @click="howToNotebook()" size="large" type="primary">Run in notebook
+              </el-button>
+            </div>
           </div>
         </el-row>
       </el-col>
-      <el-col :xl="19" :lg="19" :md="19" :sm="19" :xs="19">
-        <el-row class="min-w-[500px] max-w-[1200px]">
+      <el-col :xl="20" :lg="20" :md="20" :sm="20" :xs="20">
+        <el-row class="min-w-[500px] pr-5">
           <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
             <h2 class="center" style="word-break: break-all;">S.O.C.R.A.T.E.S.</h2>
           </el-col>
@@ -713,101 +722,95 @@ function isIterable(obj) {
             </el-col>
           </el-col>
         </el-row>
-      </el-col>
-    </el-row>
-    <div id="resultsOfInputPage">
-      <el-row :gutter="20" class="flex flex-col justify-center items-center"
-              v-if="store.parametersEdited">
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24">
-          <el-row class="pt-4"></el-row>
-          <el-row>
-            <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md"
-                 role="alert">
-              <div class="flex">
-                <div class="py-1">
-                  <svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg"
-                       viewBox="0 0 20 20">
-                    <path
-                        d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
-                  </svg>
-                </div>
-                <div>
-                  <p class="font-bold">Note: You have modified the input parameters </p>
-                  <p class="text-sm">Results will be affected and the model might return an error.
-                    To restore or modify them <a class="cursor-pointer font-bold underline"
-                                                 @click="store.showParameters = true">click here</a>
-                    and re run the model.</p>
+        <el-row class="min-w-[500px] pr-5" id="resultsOfInputPage" v-if="store.results">
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24" v-if="store.parametersEdited">
+            <el-row class="pt-4"></el-row>
+            <el-row>
+              <div class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md"
+                   role="alert">
+                <div class="flex">
+                  <div class="py-1">
+                    <svg class="fill-current h-6 w-6 text-teal-500 mr-4" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 20 20">
+                      <path
+                          d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="font-bold">Note: You have modified the input parameters </p>
+                    <p class="text-sm">Results will be affected and the model might return an error.
+                      To restore or modify them <a class="cursor-pointer font-bold underline"
+                                                   @click="store.showParameters = true">click here</a>
+                      and re run the model.</p>
+                  </div>
                 </div>
               </div>
+            </el-row>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <el-row>
+              <div class="grid">
+                <h3 class="justify-self-center text-3xl">Results</h3>
+              </div>
+            </el-row>
+            <el-row :span="24" class="max-h-[600px] overflow-auto">
+              <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
+                          :data="store.results.organic_carbon.data_points"/>
+            </el-row>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <management-table :results="store.results"/>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
+            <results-table :results="store.results" :initial-o-c="store.initialOC"/>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
+                  class="flex items-center justify-center">
+            <h3 class="justify-self-center text-3xl">Total greenhouse gas emissions</h3>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
+                  class="w-full">
+            <div class="grid place-items-center">
+            <pie-chart :data="store.results"/>
             </div>
-          </el-row>
-        </el-col>
-      </el-row>
-      <el-row :gutter="20" class="flex flex-col justify-center items-center">
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-                v-if="store.results">
-          <el-row>
-            <div class="grid">
-              <h3 class="justify-self-center text-3xl">Results</h3>
+          </el-col>
+          <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
+                  class="py-10">
+            <div>
+              <el-button @click="scrollToTop('topOfInputPage')" size="large" type="info">Scroll to Top</el-button>
             </div>
-          </el-row>
-          <el-row :span="24" class="max-h-[600px] overflow-auto">
-            <line-chart :label="'Organic Carbon (0-10cm)'" :x-axis="store.results.years"
-                        :data="store.results.organic_carbon.data_points"/>
-          </el-row>
-        </el-col>
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-                v-if="store.results">
-          <management-table :results="store.results"/>
-        </el-col>
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-                v-if="store.results">
-          <results-table :results="store.results" :initial-o-c="store.initialOC"/>
-        </el-col>
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-                v-if="store.results">
-          <pie-chart :label="'Total greenhouse gas emissions'"
-                     :data="store.results"/>
-        </el-col>
-        <el-col :span="24" :xl="20" :lg="20" :md="20" :sm="24" :xs="24"
-                class="py-10" v-if="store.results">
-          <div>
-            <el-button @click="saveResults()" data-toggle="modal" size="large" type="primary">Save Results</el-button>
-            <el-button v-if="store.results" @click="howToNotebook()" size="large" type="primary">Run in notebook
-            </el-button>
-            <el-button @click="scrollToTop('topOfInputPage')" size="large" type="info">Scroll to Top</el-button>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-    <el-dialog v-model="store.displayRunInNotebook"
-               title="## Copy and Paste the following code in a jupyter notebook ##">
-      <div class="overflow-x-scroll">
-        <code>
-          <ul class="list-none list-inside">
-            <li v-for="row of store.jupyterSource" class="break-normal">{{ row }}</li>
-          </ul>
-        </code>
-      </div>
-      <template #footer>
-        <div style="flex: auto">
-          <el-button type="primary" @click="store.displayRunInNotebook=false">Close</el-button>
-        </div>
-      </template>
-    </el-dialog>
-    <el-dialog v-model="store.showLoadDialog" title="Load Data">
-      <el-form>
-        <input type="file" @change="loadData($event)" @click="$event.target.value=''" accept="application/json"/>
-      </el-form>
-      <br/>
-      <div class="is-align-center">or</div>
-      <br/>
-      <br/>
-      <div>
-        <el-button @click="loadSampleData()" size="large" type="primary">Load Example Data</el-button>
-      </div>
-    </el-dialog>
+          </el-col>
+        </el-row>
+      </el-col>
+    </el-row>
   </div>
+  <el-dialog v-model="store.displayRunInNotebook"
+             title="## Copy and Paste the following code in a jupyter notebook ##">
+    <div class="overflow-x-scroll">
+      <code>
+        <ul class="list-none list-inside">
+          <li v-for="row of store.jupyterSource" class="break-normal">{{ row }}</li>
+        </ul>
+      </code>
+    </div>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button type="primary" @click="store.displayRunInNotebook=false">Close</el-button>
+      </div>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="store.showLoadDialog" title="Load Data">
+    <el-form>
+      <input type="file" @change="loadData($event)" @click="$event.target.value=''" accept="application/json"/>
+    </el-form>
+    <br/>
+    <div class="is-align-center">or</div>
+    <br/>
+    <br/>
+    <div>
+      <el-button @click="loadSampleData()" size="large" type="primary">Load Example Data</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped>
