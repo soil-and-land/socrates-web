@@ -1,7 +1,7 @@
 {
   "name": "socrates-web",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.0.11",
   "type": "module",
   "homepage": "https://soil-and-land.github.io/socrates-web/",
   "scripts": {

@@ -770,8 +770,12 @@ function isIterable(obj) {
           </el-col>
           <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
                   class="w-full">
+            <!--Not using pie anymore switched to a bar chart to display negatives a bit better-->
+            <!--<div class="grid place-items-center">-->
+            <!--  <pie-chart :data="store.results"/>-->
+            <!--</div>-->
             <div class="grid place-items-center">
-            <pie-chart :data="store.results"/>
+              <bar-chart :data="store.results"/>
             </div>
           </el-col>
           <el-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24"
