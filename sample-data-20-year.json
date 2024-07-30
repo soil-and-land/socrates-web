@@ -1,0 +1,65 @@
+{
+  "version": "1",
+  "soil": {
+    "soil_properties": 7,
+    "cec": 80,
+    "initial_oc": 1.15
+  },
+  "simulation": {
+    "start_year": 1963,
+    "period_length": 20,
+    "rotation_length": 3
+  },
+  "climate": {
+    "climate_method_data_entry": 1,
+    "average_annual_rainfall": 600,
+    "annual_mean_temperature": 16.7,
+    "randomize_rain_and_temperature": 0,
+    "annual_rainfall": [
+      {
+        "rainfall": 1
+      },
+      {
+        "rainfall": 1
+      }
+    ],
+    "month_rain_temp": [
+      {
+        "rainfall": null,
+        "temperature": null
+      },
+      {
+        "rainfall": null,
+        "temperature": null
+      }
+    ]
+  },
+  "rotation": [
+    {
+      "year": 1,
+      "plant": 6,
+      "stubble": null,
+      "graze": null,
+      "fertiliser": 0
+    },
+    {
+      "year": 2,
+      "plant": 0,
+      "stubble": 0,
+      "graze": null,
+      "fertiliser": 200
+    },
+    {
+      "year": 3,
+      "plant": 5,
+      "stubble": null,
+      "graze": 1,
+      "fertiliser": 0
+    }
+  ],
+  "yields": {
+    "yields_method_data_entry": 1,
+    "annual_yields": [
+    ]
+  }
+}
