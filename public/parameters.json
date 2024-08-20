@@ -42,11 +42,11 @@
   "ef1": 0.01,
   "ef2": 0.0035,
   "n2o_n": 1.57,
-  "gwpn2o": 296,
+  "gwpn2o": 265,
   "co2_c": 3.67,
   "fracf": 0.1,
   "fracu": 0.2,
   "fracl": 0.3,
   "ch4_sheep": 8,
-  "gwp_ch4": 34
+  "gwp_ch4": 28
 }
