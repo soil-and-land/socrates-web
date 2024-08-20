@@ -154,7 +154,7 @@
                 Assessment Report, N<sub>2</sub>O = 265, CH<sub>4</sub> = 28</p>
               <ul>
                 <li>N<sub>2</sub>O (fertiliser) - N<sub>2</sub>O produced from the application of nitrogen fertiliser -
-                  current 1% of nitrogen applied (kg N/ha). N<sub>2</sub>O Global Warming Potential = 296
+                  current 1% of nitrogen applied (kg N/ha).
                 </li>
                 <li>N<sub>2</sub>O mineralised - the amount of N<sub>2</sub>O produced from the nitrogen mineralised
                   from soil organic matter.
