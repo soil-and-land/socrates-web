@@ -22,7 +22,7 @@ export async function run({socrates, parameters}) {
 }
 
 export async function parameters() {
-  let response = await fetch('parameters.json');
+  let response = await fetch('parameters.json?nocache=' + (new Date()).getTime());
   let status = response.status;
   response = await response.json();
   if (status === 200) {
